@@ -17,13 +17,14 @@ function PacksPage() {
                 const responseData = response.data;
                 const setsArray = responseData.sets;
                 const today = new Date().toISOString().split("T")[0];
+                const ACCEPTED_SET_TYPES = ['expansion', 'core'];
 
                 const filteredSets = setsArray.filter((pack) => {
-                    const isExpansion = pack.set_type === "expansion";
+                    const isAcceptedType = ACCEPTED_SET_TYPES.includes(pack.set_type);
                     const isReleased = pack.released_at <= today;
                     const isExcluded = EXCLUDED_SET_CODES.includes(pack.code);
 
-                    return isExpansion && isReleased && !isExcluded;
+                    return isAcceptedType && isReleased && !isExcluded;
                 });
 
                 setPacks({ ...responseData, sets: filteredSets });
