@@ -8,6 +8,8 @@ function PacksPage() {
     const [searchTerm, setSearchTerm] = useState("");
     const [sortBy, setSortBy] = useState("released_at_desc");
 
+    const EXCLUDED_SET_CODES = ['om1'];
+
     function fetchPacks() {
         axios
             .get("http://localhost:3000/set")
@@ -15,11 +17,15 @@ function PacksPage() {
                 const responseData = response.data;
                 const setsArray = responseData.sets;
                 const today = new Date().toISOString().split("T")[0];
+
                 const filteredSets = setsArray.filter((pack) => {
                     const isExpansion = pack.set_type === "expansion";
                     const isReleased = pack.released_at <= today;
-                    return isExpansion && isReleased;
+                    const isExcluded = EXCLUDED_SET_CODES.includes(pack.code);
+
+                    return isExpansion && isReleased && !isExcluded;
                 });
+
                 setPacks({ ...responseData, sets: filteredSets });
                 setLoading(false);
             })
@@ -41,22 +47,28 @@ function PacksPage() {
         fetchPacks();
     }, []);
 
+    console.log(packs);
+
+
     const packsToDisplay = packs.sets
         ? packs.sets
             .filter((pack) =>
                 pack.name.toLowerCase().includes(searchTerm.toLowerCase())
             )
             .sort((a, b) => {
+                let comparison = 0;
+
                 if (sortBy === "name_asc") {
-                    return a.name.localeCompare(b.name);
+                    comparison = a.name.localeCompare(b.name);
                 } else if (sortBy === "name_desc") {
-                    return b.name.localeCompare(a.name);
+                    comparison = b.name.localeCompare(a.name);
                 } else if (sortBy === "released_at_desc") {
-                    return new Date(b.released_at) - new Date(a.released_at);
+                    comparison = new Date(b.released_at) - new Date(a.released_at);
                 } else if (sortBy === "released_at_asc") {
-                    return new Date(a.released_at) - new Date(b.released_at);
+                    comparison = new Date(a.released_at) - new Date(b.released_at);
                 }
-                return 0;
+
+                return comparison;
             })
         : [];
 
