@@ -75,7 +75,7 @@ function PacksPage() {
     return (
         <>
             <h1>Pagina dei pacchetti</h1>
-            <div style={{ display: "flex", gap: "20px", marginBottom: "20px" }}>
+            <div className="controls-container d-flex justify-content-center" style={{ marginBottom: "1rem" }}>
                 <input
                     type="text"
                     placeholder="Cerca per nome del pacchetto..."
