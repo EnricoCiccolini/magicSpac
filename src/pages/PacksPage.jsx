@@ -10,7 +10,7 @@ function PacksPage() {
 
     function fetchPacks() {
         axios
-            .get("http://localhost:3003/set")
+            .get("http://localhost:3000/set")
             .then((response) => {
                 const responseData = response.data;
                 const setsArray = responseData.sets;

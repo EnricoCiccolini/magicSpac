@@ -10,7 +10,7 @@ function PacksDettail() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        axios.get(`http://localhost:3003/set/open/${slug}`)
+        axios.get(`http://localhost:3000/set/open/${slug}`)
             .then((response) => {
                 setData(response.data);
                 setLoading(false);
