@@ -56,20 +56,24 @@ function PacksDettail() {
                 </div>
             ) : (
                 <div className="cards-grid">
-                    {data.contents && data.contents.map((carta, index) => (
-                        <div 
-                            key={index} 
-                            className={`card rarity-${carta.rarity?.toLowerCase()}`}
-                            style={{ 
-                                animationDelay: `${index * 0.1}s`
-                            }}
-                        >
-                            <h3>{carta.nome}</h3>
-                            <p>Slot: {carta.slot}</p>
-                            <p>Rarità: {carta.rarity}</p>
-                            <img src={carta.immagineUrl} alt={carta.nome} style={{ maxWidth: "15rem" }} />
-                        </div>
-                    ))}
+                    {data.contents && data.contents.map((carta, index) => {
+                        const isFoil = carta.slot && carta.slot.toLowerCase() === 'jolly';
+                        return (
+                            <div 
+                                key={index} 
+                                className={`card ${isFoil ? 'foil-card' : ''} rarity-${carta.rarity?.toLowerCase()}`}
+                                style={{ 
+                                    animationDelay: `${index * 0.1}s`
+                                }}
+                            >
+                                <h3>{carta.nome}</h3>
+                                <p>Slot: {carta.slot}</p>
+                                <p>Rarità: {carta.rarity}</p>
+                                {isFoil && <p style={{ color: '#e94560', fontWeight: 'bold' }}>⭐ FOIL ⭐</p>}
+                                <img src={carta.immagineUrl} alt={carta.nome} style={{ maxWidth: "15rem" }} />
+                            </div>
+                        );
+                    })}
                 </div>
             )}
         </>
