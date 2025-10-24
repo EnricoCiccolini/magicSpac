@@ -5,12 +5,16 @@ import { useEffect, useState } from "react";
 function PacksPage() {
     const [packs, setPacks] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [searchTerm, setSearchTerm] = useState("");
-    const [sortBy, setSortBy] = useState("released_at_desc");
+    
+    // Carica impostazioni salvate da sessionStorage
+    const [searchTerm, setSearchTerm] = useState(() => {
+        return sessionStorage.getItem('mtg_searchTerm') || "";
+    });
+    const [sortBy, setSortBy] = useState(() => {
+        return sessionStorage.getItem('mtg_sortBy') || "released_at_desc";
+    });
 
     const EXCLUDED_SET_CODES = ['om1'];
-
-
 
     function fetchPacks() {
         axios
@@ -40,19 +44,20 @@ function PacksPage() {
     }
 
     function handleSearchChange(e) {
-        setSearchTerm(e.target.value);
+        const value = e.target.value;
+        setSearchTerm(value);
+        sessionStorage.setItem('mtg_searchTerm', value);
     }
 
     function handleSortChange(e) {
-        setSortBy(e.target.value);
+        const value = e.target.value;
+        setSortBy(value);
+        sessionStorage.setItem('mtg_sortBy', value);
     }
 
     useEffect(() => {
         fetchPacks();
     }, []);
-
-    console.log(packs);
-
 
     const packsToDisplay = packs.sets
         ? packs.sets
@@ -78,8 +83,14 @@ function PacksPage() {
 
     return (
         <>
-            <h1>Pagina dei pacchetti</h1>
-            <div className="controls-container d-flex justify-content-center" style={{ marginBottom: "1rem" }}>
+            <div className="page-header">
+                <Link to="/" className="btn btn-outline-light back-button">
+                    <span>← Torna alla Home</span>
+                </Link>
+                <h1>Scegli il tuo pacchetto</h1>
+            </div>
+
+            <div className="controls-container d-flex justify-content-center gap-3" style={{ marginBottom: "1rem" }}>
                 <input
                     type="text"
                     placeholder="Cerca per nome del pacchetto..."
@@ -98,27 +109,37 @@ function PacksPage() {
                     <option value="released_at_asc">Data Uscita (Meno Recenti) ⬆️</option>
                 </select>
             </div>
+
             {loading ? (
-                <p>Loading...</p>
-            ) : (
-                packsToDisplay.map((pack) => (
-                    <div key={pack.id} className="card" style={{ marginBottom: "1rem" }}>
-                        <h2>{pack.name}</h2>
-                        <p>Code: {pack.code}</p>
-                        <img
-                            src={pack.icon_svg_uri}
-                            alt={pack.name}
-                            style={{ maxWidth: "3rem" }}
-                        />
-                        <p>Release Date: {pack.released_at}</p>
-                        <Link className="btn btn-success" to={`/packs/${pack.code}`}>
-                            vai ad aprire
-                        </Link>
+                <div className="mtg-spinner-container">
+                    <div className="mtg-spinner">
+                        <div className="mana-symbol">✦</div>
                     </div>
-                ))
-            )}
-            {packsToDisplay.length === 0 && !loading && (
-                <p>Nessun pacchetto trovato con i criteri attuali.</p>
+                    <p className="loading-text">Caricamento pacchetti...</p>
+                </div>
+            ) : (
+                <>
+                    {packsToDisplay.map((pack) => (
+                        <div key={pack.id} className="card pack-card" style={{ marginBottom: "1rem" }}>
+                            <h2>{pack.name}</h2>
+                            <p>Code: {pack.code}</p>
+                            <img
+                                src={pack.icon_svg_uri}
+                                alt={pack.name}
+                                style={{ maxWidth: "3rem" }}
+                            />
+                            <p>Release Date: {pack.released_at}</p>
+                            <Link className="btn btn-success" to={`/packs/${pack.code}`}>
+                                🎲 Apri pacchetto
+                            </Link>
+                        </div>
+                    ))}
+                    {packsToDisplay.length === 0 && (
+                        <div className="text-center text-white mt-5">
+                            <p style={{ fontSize: "1.2rem" }}>Nessun pacchetto trovato con i criteri attuali.</p>
+                        </div>
+                    )}
+                </>
             )}
         </>
     );
