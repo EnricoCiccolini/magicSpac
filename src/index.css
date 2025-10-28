@@ -306,10 +306,14 @@ select:focus {
     display: block;
     margin-left: auto;
     margin-right: auto;
+    
+    /* Regola l'immagine all'interno delle card aperte */
+    max-width: 90%; 
+    height: auto;
 }
 
-/* Icon size for pack selection */
-.card img[style*="3rem"] {
+/* Icon size for pack selection (PacksPage) */
+.card img[style*="6rem"] {
     max-width: 6rem !important;
     height: auto;
 }
@@ -380,31 +384,49 @@ select:focus {
     box-shadow: 0 5px 15px rgba(255, 255, 255, 0.3);
 }
 
-/* Card Grid Layout for opened packs */
+/* Card Grid Layout for opened packs (PacksDettailPage) */
 .cards-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    /* Usa un layout flessibile per la colonna, la larghezza della card sarà imposta sotto */
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
     gap: 20px;
     margin-top: 20px;
 }
 
 .cards-grid .card {
-    min-height: 450px;
+    /* Imposta un'altezza fissa uniforme per tutte le card aperte */
+    height: 500px; 
+    /* FORZA LA LARGHEZZA ALL'INTERNO DELLA GRIGLIA: 
+       Assicura che la card non si restringa più del dovuto, 
+       ma si adatti allo spazio della colonna (1fr) */
+    width: 100%; 
+    max-width: 350px; /* Larghezza massima per le card */
+    
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
     align-items: center;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .cards-grid .card h3 {
-    min-height: 2.6em;
+    /* Blocca l'area del titolo a 3 linee e forza l'andata a capo */
+    min-height: 4em; /* Assicura spazio per 3 linee di testo circa */
+    max-height: 4em; 
+    overflow: hidden; 
+    text-overflow: ellipsis; /* Aggiunge i puntini se il testo è troppo lungo */
+    
     display: flex;
-    align-items: center;
+    align-items: center; /* Centra verticalmente il testo nel blocco di 3 righe */
     justify-content: center;
     text-align: center;
     line-height: 1.3;
     margin-bottom: 10px;
     width: 100%;
+    /* Permetti al testo di andare a capo */
+    white-space: normal; 
+    word-break: break-word;
 }
 
 .cards-grid .card p {
@@ -412,6 +434,7 @@ select:focus {
 }
 
 .cards-grid .card img {
+    /* Mantiene l'immagine spinta verso il basso */
     margin-top: auto;
 }
 
@@ -564,6 +587,7 @@ h1 {
         font-size: 1.8rem;
     }
 
+    /* Griglia per le card aperte su mobile: 1 colonna */
     .cards-grid {
         grid-template-columns: 1fr;
     }
@@ -611,8 +635,9 @@ h1 {
         transform: translateY(-5px);
     }
     
+    /* Mantieni altezza uniforme anche su mobile */
     .cards-grid .card {
-        min-height: 400px;
+        height: 500px;
     }
     
     .card.pack-card {
