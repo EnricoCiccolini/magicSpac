@@ -1,3 +1,4 @@
+
 import axios from "axios";
 import { Link } from "react-router-dom";
 import { useEffect, useState, useMemo } from "react";
@@ -10,10 +11,7 @@ function PacksPage() {
     const [loading, setLoading] = useState(true);
     // Stato per la paginazione. Inizializzo a 1.
     const [currentPage, setCurrentPage] = useState(1);
-    
-    // Lo stato 'pages' non serve più direttamente nel componente, 
-    // il totale delle pagine sarà calcolato in base alla lunghezza di packsToDisplay
-    
+
     // Carica impostazioni salvate da sessionStorage
     const [searchTerm, setSearchTerm] = useState(() => {
         return sessionStorage.getItem('mtg_searchTerm') || "";
@@ -22,7 +20,7 @@ function PacksPage() {
         return sessionStorage.getItem('mtg_sortBy') || "released_at_desc";
     });
 
-    
+
     function fetchPacks() {
         setLoading(true);
         // Chiamata per recuperare TUTTI i set, gestendo filtro/ordinamento/paginazione lato client
@@ -30,11 +28,10 @@ function PacksPage() {
             .get("http://localhost:3000/set")
             .then((response) => {
                 // Assumo che response.data.sets contenga l'array di tutti i set
-                // Ho fatto una piccola correzione qui per gestire response.data o response.data.sets
                 const allSets = response.data.sets || response.data || [];
                 setPacks(allSets);
                 // Resetto la pagina corrente a 1 dopo il caricamento completo
-                setCurrentPage(1); 
+                setCurrentPage(1);
                 setLoading(false);
             })
             .catch((error) => {
@@ -48,7 +45,7 @@ function PacksPage() {
         setSearchTerm(value);
         sessionStorage.setItem('mtg_searchTerm', value);
         // IMPORTANTE: Quando l'utente cerca, si torna alla prima pagina.
-        setCurrentPage(1); 
+        setCurrentPage(1);
     }
 
     function handleSortChange(e) {
@@ -72,7 +69,6 @@ function PacksPage() {
 
 
     // USES MEMO PER FILTRO, ORDINAMENTO E PAGINAZIONE
-    // Questo è il blocco corretto e completo.
     const { packsToDisplay, totalFilteredPages, totalFilteredPacks } = useMemo(() => {
         // La variabile 'packs' può essere un array diretto o contenere l'array in 'packs.sets'
         const packsArray = Array.isArray(packs) ? packs : (packs.sets || []);
@@ -81,7 +77,7 @@ function PacksPage() {
         const filteredPacks = packsArray.filter((pack) =>
             pack.name.toLowerCase().includes(searchTerm.toLowerCase())
         );
-        
+
         // 2. Ordinamento (si applica ai pacchetti filtrati)
         const sortedPacks = filteredPacks.sort((a, b) => {
             let comparison = 0;
@@ -102,17 +98,17 @@ function PacksPage() {
         // 3. Paginazione (si applica ai pacchetti filtrati e ordinati)
         const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
         const endIndex = startIndex + ITEMS_PER_PAGE;
-        
+
         const packsForCurrentPage = sortedPacks.slice(startIndex, endIndex);
 
         const totalPages = Math.ceil(filteredPacks.length / ITEMS_PER_PAGE);
 
-        return { 
-            packsToDisplay: packsForCurrentPage, 
+        return {
+            packsToDisplay: packsForCurrentPage,
             totalFilteredPages: totalPages,
             totalFilteredPacks: filteredPacks.length
         };
-        
+
     }, [packs, searchTerm, sortBy, currentPage]); // Dipendenze: si aggiorna al cambio di pagina
 
     // Logica per i pulsanti di paginazione (visualizzazione compatta)
@@ -126,7 +122,7 @@ function PacksPage() {
             endPage = totalPages;
         } else {
             const halfMax = Math.floor(maxPagesToShow / 2);
-            
+
             if (currentPage <= halfMax) {
                 startPage = 1;
                 endPage = maxPagesToShow;
@@ -138,20 +134,85 @@ function PacksPage() {
                 endPage = currentPage + halfMax;
             }
         }
-        
+
         // Previene che startPage sia minore di 1 se totalPages è piccolo
         if (startPage < 1) startPage = 1;
 
         const pages = Array.from({ length: (endPage - startPage) + 1 }, (_, i) => startPage + i);
-        
-        return { 
-            pages, 
-            showStartEllipsis: startPage > 1, 
-            showEndEllipsis: endPage < totalPages 
+
+        return {
+            pages,
+            showStartEllipsis: startPage > 1,
+            showEndEllipsis: endPage < totalPages
         };
     };
-    
+
     const { pages, showStartEllipsis, showEndEllipsis } = getPageNumbers();
+
+    // Componente di paginazione riutilizzabile
+    const PaginationControls = () => (
+        <div className="pagination-container">
+            {/* Controlli Precedente/Successiva */}
+            <div className="d-flex justify-content-center align-items-center gap-3 mb-3 flex-wrap">
+                <button
+                    className="btn btn-outline-light pagination-nav-btn"
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 1}
+                >
+                    ← Precedente
+                </button>
+
+                <span className="text-white page-status-text">
+                    Pagina {currentPage} di {totalFilteredPages}
+                </span>
+
+                <button
+                    className="btn btn-outline-light pagination-nav-btn"
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage === totalFilteredPages}
+                >
+                    Successiva →
+                </button>
+            </div>
+
+            {/* Numeri di pagina cliccabili */}
+            <div className="d-flex justify-content-center align-items-center gap-2 flex-wrap">
+                {showStartEllipsis && (
+                    <>
+                        <button
+                            className="btn btn-sm btn-outline-light pagination-page-btn"
+                            onClick={() => handlePageChange(1)}
+                        >
+                            1
+                        </button>
+                        <span className="text-white ellipsis-text">...</span>
+                    </>
+                )}
+
+                {pages.map(page => (
+                    <button
+                        key={page}
+                        className={`btn btn-sm pagination-page-btn ${page === currentPage ? 'btn-success pagination-active' : 'btn-outline-light'}`}
+                        onClick={() => handlePageChange(page)}
+                    >
+                        {page}
+                    </button>
+                ))}
+
+                {showEndEllipsis && (
+                    <>
+                        <span className="text-white ellipsis-text">...</span>
+                        <button
+                            className="btn btn-sm btn-outline-light pagination-page-btn"
+                            onClick={() => handlePageChange(totalFilteredPages)}
+                        >
+                            {totalFilteredPages}
+                        </button>
+                    </>
+                )}
+            </div>
+        </div>
+    );
 
 
     return (
@@ -172,15 +233,15 @@ function PacksPage() {
                     onChange={handleSearchChange}
                     className="form-control custom-input"
                 />
-                
+
                 {/* SELECT PER ORDINAMENTO */}
                 <div className="sort-buttons-group d-flex gap-2 flex-wrap justify-content-center">
                     <span className="text-white align-self-center d-none d-sm-block sort-label">Ordina per:</span>
-                    
+
                     <select
                         value={sortBy}
                         onChange={handleSortChange}
-                        className="form-select custom-select" // Uso una classe per lo stile
+                        className="form-select custom-select"
                     >
                         <option value="released_at_desc">Data Uscita (Recenti) ⬇️</option>
                         <option value="released_at_asc">Data Uscita (Meno Recenti) ⬆️</option>
@@ -201,16 +262,15 @@ function PacksPage() {
             ) : (
                 <>
                     {/* Contenitore per le card */}
-                    <div className="packs-grid d-flex flex-wrap justify-content-center gap-4">
+                    <div className="packs-grid">
                         {packsToDisplay.map((pack) => (
-                            // Rimosso stile in linea, uso classi
-                            <div key={pack.id} className="card pack-card"> 
+                            <div key={pack.id} className="card pack-card">
                                 <h2>{pack.name}</h2>
                                 <p>Code: {pack.code}</p>
                                 <img
                                     src={pack.icon_svg_uri}
                                     alt={pack.name}
-                                    style={{ maxWidth: "6rem" }} // Dimensione icona
+                                    className="pack-icon"
                                 />
                                 <p>Release Date: {pack.released_at}</p>
                                 <Link className="btn btn-success" to={`/packs/${pack.code}`}>
@@ -219,7 +279,7 @@ function PacksPage() {
                             </div>
                         ))}
                     </div>
-                    
+
                     {packsToDisplay.length === 0 && (
                         <div className="text-center text-white mt-5">
                             <p style={{ fontSize: "1.2rem" }}>Nessun pacchetto trovato con i criteri attuali.</p>
@@ -240,11 +300,11 @@ function PacksPage() {
                         >
                             ← Precedente
                         </button>
-                        
+
                         <span className="text-white page-status-text">
                             Pagina {currentPage} di {totalFilteredPages}
                         </span>
-                        
+
                         <button
                             className="btn btn-outline-light pagination-nav-btn"
                             onClick={() => handlePageChange(currentPage + 1)}
@@ -267,7 +327,7 @@ function PacksPage() {
                                 <span className="text-white ellipsis-text">...</span>
                             </>
                         )}
-                        
+
                         {pages.map(page => (
                             <button
                                 key={page}
@@ -277,7 +337,7 @@ function PacksPage() {
                                 {page}
                             </button>
                         ))}
-                        
+
                         {showEndEllipsis && (
                             <>
                                 <span className="text-white ellipsis-text">...</span>

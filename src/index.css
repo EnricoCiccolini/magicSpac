@@ -1,5 +1,3 @@
-/* Custom styles for MTG Pack Simulator */
-
 /* General body and layout */
 body {
     background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
@@ -124,6 +122,16 @@ select:focus {
     transform: translateY(-2px);
 }
 
+/* Pack Grid Layout (PacksPage) */
+.packs-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 30px;
+    margin: 30px auto;
+    max-width: 1400px;
+    padding: 0 20px;
+}
+
 /* Pack Cards */
 .card {
     position: relative;
@@ -133,31 +141,36 @@ select:focus {
     padding: 20px !important;
     transition: all 0.3s ease;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-    max-width: 600px;
-    margin-left: auto !important;
-    margin-right: auto !important;
     text-align: center;
     animation: fadeInUp 0.5s ease forwards;
     opacity: 0;
     overflow: hidden;
 }
 
-/* Fixed height for pack selection cards */
+/* Pack selection cards (PacksPage) */
 .card.pack-card {
-    min-height: 350px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    width: 100%;
+    min-width: 0;
 }
 
 .card.pack-card h2 {
-    min-height: 3em;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    line-height: 1.3;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    width: 100%;
+    line-height: 1.4;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
+    font-size: 1.5rem;
+}
+
+.card.pack-card .pack-icon {
+    max-width: 6rem;
+    height: auto;
+    margin: 10px 0;
 }
 
 /* Pack Cards with Holographic Effect - ONLY FOR JOLLY SLOT */
@@ -174,14 +187,12 @@ select:focus {
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(
-        45deg,
-        transparent 0%,
-        rgba(255, 0, 255, 0.15) 25%,
-        rgba(0, 255, 255, 0.15) 50%,
-        rgba(255, 255, 0, 0.15) 75%,
-        transparent 100%
-    );
+    background: linear-gradient(45deg,
+            transparent 0%,
+            rgba(255, 0, 255, 0.15) 25%,
+            rgba(0, 255, 255, 0.15) 50%,
+            rgba(255, 255, 0, 0.15) 75%,
+            transparent 100%);
     background-size: 200% 200%;
     opacity: 0;
     transition: opacity 0.3s ease;
@@ -197,13 +208,11 @@ select:focus {
     left: -50%;
     width: 200%;
     height: 200%;
-    background: repeating-linear-gradient(
-        0deg,
-        transparent,
-        transparent 2px,
-        rgba(255, 255, 255, 0.05) 2px,
-        rgba(255, 255, 255, 0.05) 4px
-    );
+    background: repeating-linear-gradient(0deg,
+            transparent,
+            transparent 2px,
+            rgba(255, 255, 255, 0.05) 2px,
+            rgba(255, 255, 255, 0.05) 4px);
     opacity: 0;
     transition: opacity 0.3s ease;
     pointer-events: none;
@@ -215,6 +224,7 @@ select:focus {
     0% {
         transform: translateY(0) rotate(0deg);
     }
+
     100% {
         transform: translateY(20px) rotate(0deg);
     }
@@ -233,9 +243,11 @@ select:focus {
     0% {
         background-position: 0% 0%;
     }
+
     50% {
         background-position: 100% 100%;
     }
+
     100% {
         background-position: 0% 0%;
     }
@@ -244,17 +256,15 @@ select:focus {
 /* Holographic shine effect on hover - ONLY FOR FOIL CARDS */
 .card.foil-card:hover {
     transform: translateY(-8px) rotateX(2deg);
-    box-shadow: 
+    box-shadow:
         0 12px 30px rgba(233, 69, 96, 0.4),
         0 0 40px rgba(255, 0, 255, 0.2),
         0 0 60px rgba(0, 255, 255, 0.2);
     border-color: #e94560 !important;
-    background: linear-gradient(
-        135deg,
-        rgba(255, 255, 255, 0.98) 0%,
-        rgba(240, 240, 255, 0.98) 50%,
-        rgba(255, 240, 255, 0.98) 100%
-    );
+    background: linear-gradient(135deg,
+            rgba(255, 255, 255, 0.98) 0%,
+            rgba(240, 240, 255, 0.98) 50%,
+            rgba(255, 240, 255, 0.98) 100%);
 }
 
 /* Normal card hover (non-foil) */
@@ -269,6 +279,7 @@ select:focus {
         opacity: 0;
         transform: translateY(20px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -276,7 +287,7 @@ select:focus {
 }
 
 /* Ensure content stays above holographic effects */
-.card > * {
+.card>* {
     position: relative;
     z-index: 2;
 }
@@ -306,15 +317,7 @@ select:focus {
     display: block;
     margin-left: auto;
     margin-right: auto;
-    
-    /* Regola l'immagine all'interno delle card aperte */
-    max-width: 90%; 
-    height: auto;
-}
-
-/* Icon size for pack selection (PacksPage) */
-.card img[style*="6rem"] {
-    max-width: 6rem !important;
+    max-width: 90%;
     height: auto;
 }
 
@@ -387,21 +390,16 @@ select:focus {
 /* Card Grid Layout for opened packs (PacksDettailPage) */
 .cards-grid {
     display: grid;
-    /* Usa un layout flessibile per la colonna, la larghezza della card sarà imposta sotto */
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 20px;
     margin-top: 20px;
 }
 
 .cards-grid .card {
-    /* Imposta un'altezza fissa uniforme per tutte le card aperte */
-    height: 500px; 
-    /* FORZA LA LARGHEZZA ALL'INTERNO DELLA GRIGLIA: 
-       Assicura che la card non si restringa più del dovuto, 
-       ma si adatti allo spazio della colonna (1fr) */
-    width: 100%; 
-    max-width: 350px; /* Larghezza massima per le card */
-    
+    height: 500px;
+    width: 100%;
+    max-width: 350px;
+
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
@@ -411,21 +409,19 @@ select:focus {
 }
 
 .cards-grid .card h3 {
-    /* Blocca l'area del titolo a 3 linee e forza l'andata a capo */
-    min-height: 4em; /* Assicura spazio per 3 linee di testo circa */
-    max-height: 4em; 
-    overflow: hidden; 
-    text-overflow: ellipsis; /* Aggiunge i puntini se il testo è troppo lungo */
-    
+    min-height: 4em;
+    max-height: 4em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
     display: flex;
-    align-items: center; /* Centra verticalmente il testo nel blocco di 3 righe */
+    align-items: center;
     justify-content: center;
     text-align: center;
     line-height: 1.3;
     margin-bottom: 10px;
     width: 100%;
-    /* Permetti al testo di andare a capo */
-    white-space: normal; 
+    white-space: normal;
     word-break: break-word;
 }
 
@@ -434,7 +430,6 @@ select:focus {
 }
 
 .cards-grid .card img {
-    /* Mantiene l'immagine spinta verso il basso */
     margin-top: auto;
 }
 
@@ -512,9 +507,11 @@ select:focus {
     0% {
         transform: rotate(0deg) scale(1);
     }
+
     50% {
         transform: rotate(180deg) scale(1.1);
     }
+
     100% {
         transform: rotate(360deg) scale(1);
     }
@@ -524,19 +521,24 @@ select:focus {
     0% {
         transform: rotate(0deg) scale(1);
     }
+
     50% {
         transform: rotate(-180deg) scale(1.1);
     }
+
     100% {
         transform: rotate(-360deg) scale(1);
     }
 }
 
 @keyframes pulse {
-    0%, 100% {
+
+    0%,
+    100% {
         transform: translate(-50%, -50%) scale(1);
         opacity: 1;
     }
+
     50% {
         transform: translate(-50%, -50%) scale(1.2);
         opacity: 0.8;
@@ -552,9 +554,12 @@ select:focus {
 }
 
 @keyframes fadeInOut {
-    0%, 100% {
+
+    0%,
+    100% {
         opacity: 1;
     }
+
     50% {
         opacity: 0.5;
     }
@@ -581,10 +586,67 @@ h1 {
     text-align: center;
 }
 
+/* Pagination Styles */
+.pagination-container {
+    margin: 30px auto;
+    max-width: 900px;
+    padding: 20px;
+}
+
+.pagination-nav-btn {
+    min-width: 120px;
+    font-weight: 600;
+}
+
+.page-status-text {
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.pagination-page-btn {
+    min-width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.pagination-active {
+    font-weight: bold;
+}
+
+.ellipsis-text {
+    font-size: 1.2rem;
+    padding: 0 5px;
+}
+
+/* Sort controls */
+.sort-buttons-group {
+    width: 100%;
+    max-width: 600px;
+}
+
+.sort-label {
+    font-weight: 600;
+}
+
+.custom-input,
+.custom-select {
+    max-width: 600px;
+    width: 100%;
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
     .home-title {
         font-size: 1.8rem;
+    }
+
+    /* Pack grid: 1 colonna su mobile */
+    .packs-grid {
+        grid-template-columns: 1fr;
     }
 
     /* Griglia per le card aperte su mobile: 1 colonna */
@@ -630,17 +692,20 @@ h1 {
     .card.foil-card:hover {
         transform: translateY(-8px);
     }
-    
+
     .card:not(.foil-card):hover {
         transform: translateY(-5px);
     }
-    
+
     /* Mantieni altezza uniforme anche su mobile */
     .cards-grid .card {
         height: 500px;
     }
-    
-    .card.pack-card {
-        min-height: 320px;
+}
+
+/* Tablet adjustments */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .packs-grid {
+        grid-template-columns: repeat(2, 1fr);
     }
 }
