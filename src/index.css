@@ -374,7 +374,7 @@ select:focus {
 .btn-action {
     padding: 12px 25px;
     font-weight: 700;
-    border-radius: 50px; 
+    border-radius: 50px;
     transition: all 0.3s ease;
     text-transform: uppercase;
     letter-spacing: 1px;
@@ -387,14 +387,14 @@ select:focus {
 
 /* Bottone 1: Indietro/Scegli altro (Blu scuro con accento Rosso) */
 .btn-go-back {
-    background-color: #16213e; 
+    background-color: #16213e;
     color: #fff;
     border: 2px solid #0f3460;
 }
 
 .btn-go-back:hover {
     background-color: #0f3460;
-    border-color: #e94560; 
+    border-color: #e94560;
     color: #e94560;
     transform: translateY(-2px) scale(1.02);
     box-shadow: 0 6px 15px rgba(233, 69, 96, 0.4);
@@ -402,8 +402,8 @@ select:focus {
 
 /* Bottone 2: Apri un altro (Gradiente Verde/Ciano) */
 .btn-open-pack {
-    background: linear-gradient(135deg, #20c997 0%, #28a745 100%); 
-    color: #0f3460; 
+    background: linear-gradient(135deg, #20c997 0%, #28a745 100%);
+    color: #0f3460;
     border: 2px solid #28a745;
 }
 
@@ -420,6 +420,7 @@ select:focus {
     transform: none;
     box-shadow: none;
 }
+
 /* --- FINE STILI BOTTONI --- */
 
 
@@ -427,22 +428,30 @@ select:focus {
 .cards-grid {
     display: grid;
     /* Default: 2 colonne, min width 200px */
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); 
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     gap: 20px;
     margin-top: 20px;
 }
 
 .cards-grid .card {
-    height: 500px;
+    /* Rimuovi l'altezza fissa e la max-width per consentire al card-container di controllarli */
+    height: auto;
     width: 100%;
-    max-width: 350px;
+    max-width: none;
 
-    display: flex;
+    /* Questi stili sono meglio gestiti dal card-container, li rimuoviamo dal .card per la coerenza del flip */
+    /* display: flex; 
     flex-direction: column;
     justify-content: flex-start;
     align-items: center;
     margin-left: auto;
-    margin-right: auto;
+    margin-right: auto; */
+
+    /* Il .card non deve avere un'altezza fissa, solo il card-container */
+    padding: 0 !important;
+    border: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
 }
 
 .cards-grid .card h3 {
@@ -680,8 +689,15 @@ h1 {
 
 /* Animazione per l'ingresso delle carte coperte */
 @keyframes fadeInScale {
-    0% { opacity: 0; transform: scale(0.9); }
-    100% { opacity: 1; transform: scale(1); }
+    0% {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
 }
 
 /* KEYFRAMES per l'effetto FOIL */
@@ -689,8 +705,24 @@ h1 {
     0% {
         background-position: 0% 0%;
     }
+
     100% {
         background-position: 100% 100%;
+    }
+}
+
+/* NUOVO KEYFRAMES per lo shift del FOIL BADGE */
+@keyframes rainbow-shift {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
     }
 }
 
@@ -698,12 +730,12 @@ h1 {
 .card-container {
     /* Imposta dimensioni e prospettiva per l'effetto 3D */
     width: 100%;
-    height: 350px; 
+    height: 350px;
     perspective: 1000px;
     cursor: pointer;
     margin-left: auto;
     margin-right: auto;
-    animation: fadeInScale 0.4s ease forwards; 
+    animation: fadeInScale 0.4s ease forwards;
     opacity: 0;
     max-width: 250px;
 }
@@ -712,17 +744,19 @@ h1 {
 .card-scale-wrapper {
     width: 100%;
     height: 100%;
-    transition: transform 0.2s ease-out; /* Transizione per lo scale */
+    transition: transform 0.2s ease-out;
+    /* Transizione per lo scale */
 }
 
 .card-inner {
     position: relative;
     width: 100%;
     height: 100%;
-    transition: transform 0.8s cubic-bezier(0.4, 0.2, 0.2, 1); /* Transizione di rotazione */
+    transition: transform 0.8s cubic-bezier(0.4, 0.2, 0.2, 1);
+    /* Transizione di rotazione */
     transform-style: preserve-3d;
     border-radius: 12px;
-    box-shadow: 0 10px 15px rgba(0,0,0,0.5);
+    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.5);
 }
 
 .card-inner.flipped {
@@ -734,7 +768,8 @@ h1 {
     position: absolute;
     width: 100%;
     height: 100%;
-    backface-visibility: hidden; /* Nasconde la faccia posteriore quando ruota */
+    backface-visibility: hidden;
+    /* Nasconde la faccia posteriore quando ruota */
     border-radius: 12px;
     overflow: hidden;
     display: flex;
@@ -746,7 +781,7 @@ h1 {
 /* Stile FOIL (invariato) */
 .foil-card .card-face.card-front {
     position: relative;
-    overflow: hidden; 
+    overflow: hidden;
     background: #1f2937;
 }
 
@@ -757,27 +792,28 @@ h1 {
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(
-        -45deg, 
-        rgba(255, 255, 255, 0) 0%, 
-        rgba(255, 255, 255, 0.2) 35%, 
-        rgba(255, 255, 255, 0.4) 45%, 
-        rgba(255, 255, 255, 0.5) 50%, 
-        rgba(255, 255, 255, 0.4) 55%, 
-        rgba(255, 255, 255, 0.2) 65%, 
-        rgba(255, 255, 255, 0) 100%
-    );
+    background: linear-gradient(-45deg,
+            rgba(255, 255, 255, 0) 0%,
+            rgba(255, 255, 255, 0.2) 35%,
+            rgba(255, 255, 255, 0.4) 45%,
+            rgba(255, 255, 255, 0.5) 50%,
+            rgba(255, 255, 255, 0.4) 55%,
+            rgba(255, 255, 255, 0.2) 65%,
+            rgba(255, 255, 255, 0) 100%);
     background-size: 200% 200%;
+    /* Mantieni l'uso dei mask-image */
     -webkit-mask-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='a'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='3' seed='10'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23a)' opacity='0.5'/%3E%3C/svg%3E");
     mask-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='a'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='3' seed='10'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23a)' opacity='0.5'/%3E%3C/svg%3E");
-    mix-blend-mode: screen; 
+    mix-blend-mode: screen;
     animation: shimmer 5s linear infinite;
     pointer-events: none;
+    z-index: 1;
+    /* Assicurati che sia sopra l'immagine ma sotto i badge */
 }
 
 
 .card-back {
-    border: 5px solid #e94560; 
+    border: 5px solid #e94560;
     justify-content: center;
     align-items: center;
     padding: 0;
@@ -790,11 +826,11 @@ h1 {
     object-fit: contain;
     display: block;
     border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
 }
 
 .card-front {
-    transform: rotateY(180deg); 
+    transform: rotateY(180deg);
     padding: 1rem;
     justify-content: flex-start;
     background: #1f2937;
@@ -802,31 +838,88 @@ h1 {
 
 /* FIX HOVER: Applica lo scale al wrapper e ripristina la rotazione se flipped */
 .card-container:hover .card-scale-wrapper {
-    transform: scale(1.03); 
-}
-.card-container:hover .card-inner {
-    /* Mantiene solo l'ombra per i non-flipped, ma non modifica la rotazione */
-    transform: none; 
-    box-shadow: 0 15px 20px rgba(0,0,0,0.7);
+    transform: scale(1.03);
 }
 
-.card-inner.flipped, 
+.card-container:hover .card-inner {
+    /* Mantiene solo l'ombra per i non-flipped, ma non modifica la rotazione */
+    transform: none;
+    box-shadow: 0 15px 20px rgba(0, 0, 0, 0.7);
+}
+
+.card-inner.flipped,
 .card-container:hover .card-inner.flipped {
     /* Forza la rotazione di 180 gradi anche su hover per le carte già girate */
-    transform: rotateY(180deg); 
+    transform: rotateY(180deg);
 }
 
 
 /* Stili per Rarità e Foil, applicati al contenitore interno per il bordo */
 .foil-card {
-    border: 3px solid #FFD700; 
+    border: 3px solid #FFD700;
     box-shadow: 0 0 20px rgba(255, 215, 0, 0.7);
 }
 
-.rarity-common { border-left: 5px solid #A9A9A9; }
-.rarity-uncommon { border-left: 5px solid #3498db; }
-.rarity-rare { border-left: 5px solid #e74c3c; }
-.rarity-mythic { border-left: 5px solid #f1c40f; }
+/* AGGIUNTA STILI BADGE */
+
+/* Stile per il badge Foil con effetto rainbow */
+.foil-badge {
+    /* Rimuovi la classe Bootstrap bg-* per usare la sfumatura */
+    background: linear-gradient(45deg,
+            #ff0000,
+            /* Rosso */
+            #ff7f00,
+            /* Arancione */
+            #ffff00,
+            /* Giallo */
+            #00ff00,
+            /* Verde */
+            #0000ff,
+            /* Blu */
+            #4b0082,
+            /* Indaco */
+            #9400d3
+            /* Viola */
+        );
+    color: #1f2937 !important;
+    border: 1px solid rgba(0, 0, 0, 0.3);
+    padding: 0.2rem 0.6rem;
+    /* Adattato al tuo padding Bootstrap */
+    font-size: 0.75rem;
+    /* Dimensione del testo per badge */
+    font-weight: bold;
+    background-size: 200% 200%;
+    animation: rainbow-shift 5s ease infinite;
+    z-index: 12;
+    /* Assicura che sia sopra l'immagine e l'effetto foil */
+}
+
+/* Stile per il badge del prezzo (Assicura che sia ben visibile e abbia uno z-index alto) */
+.price-badge {
+    padding: 0.2rem 0.6rem;
+    font-size: 0.75rem;
+    font-weight: bold;
+    z-index: 12;
+}
+
+
+/* --- Colori dei bordi Rarità (Ripristinati per coerenza) --- */
+/* NOTA: Questi sono applicati al card-container nel componente React per coerenza */
+.rarity-common {
+    border-left: 5px solid #A9A9A9;
+}
+
+.rarity-uncommon {
+    border-left: 5px solid #3498db;
+}
+
+.rarity-rare {
+    border-left: 5px solid #e74c3c;
+}
+
+.rarity-mythic {
+    border-left: 5px solid #f1c40f;
+}
 
 
 /* Responsive adjustments */
@@ -844,9 +937,10 @@ h1 {
     .cards-grid {
         grid-template-columns: repeat(2, 1fr);
     }
+
     @media (max-width: 500px) {
         .cards-grid {
-            grid-template-columns: 1fr; 
+            grid-template-columns: 1fr;
         }
     }
 
@@ -895,7 +989,8 @@ h1 {
 
     /* Mantieni altezza uniforme anche su mobile */
     .cards-grid .card {
-        height: 500px;
+        height: auto;
+        /* Lasciamo il card-container controllare l'altezza */
     }
 }
 
@@ -904,8 +999,9 @@ h1 {
     .packs-grid {
         grid-template-columns: repeat(2, 1fr);
     }
+
     .cards-grid {
-        grid-template-columns: repeat(4, 1fr); 
+        grid-template-columns: repeat(4, 1fr);
         max-width: 1200px;
         margin-left: auto;
         margin-right: auto;
@@ -915,7 +1011,7 @@ h1 {
 /* Desktop/Wide adjustments (5 colonne) */
 @media (min-width: 1200px) {
     .cards-grid {
-        grid-template-columns: repeat(5, 1fr); 
+        grid-template-columns: repeat(5, 1fr);
         max-width: 1400px;
         margin-left: auto;
         margin-right: auto;

@@ -4,33 +4,33 @@ import { useParams, useNavigate } from "react-router-dom";
 
 // --- Sottocomponente per la Carta con Effetto Flip ---
 const CardFlip = ({ carta, index }) => {
-    // Stato locale per gestire se la carta è stata girata
     const [isFlipped, setIsFlipped] = useState(false);
-    const isFoil = carta.slot && carta.slot.toLowerCase() === 'jolly';
+    const isFoil = carta.foil === true;
 
-    // Funzione che gestisce il click e gira la carta una sola volta
     const handleFlip = () => {
         if (!isFlipped) {
             setIsFlipped(true);
         }
     };
 
+    // Aggiungiamo le classi di rarità e foil al card-container
     const cardRarityClass = `rarity-${carta.rarity?.toLowerCase()}`;
-    // Immagine placeholder per il retro della carta
+    const foilContainerClass = isFoil ? 'foil-card' : '';
+
     const backImageUrl = "https://i.imgur.com/LdOBU1I.jpeg";
+    const imageUrl = Array.isArray(carta.immagineUrl) ? carta.immagineUrl[0] : carta.immagineUrl;
+
 
     return (
         <div
-            className="card-container"
+            className={`card-container ${cardRarityClass} ${foilContainerClass}`} // Classi CSS personalizzate
             onClick={handleFlip}
-            // Aggiunge un leggero ritardo all'ingresso della carta coperta
             style={{ animationDelay: `${index * 0.1}s` }}
         >
-            {/* AGGIUNTO: Wrapper per gestire l'effetto scale su hover */}
             <div className="card-scale-wrapper">
-                <div className={`card-inner ${isFlipped ? 'flipped' : ''} ${isFoil ? 'foil-card' : ''} ${cardRarityClass}`}>
+                <div className={`card-inner ${isFlipped ? 'flipped' : ''}`}>
 
-                    {/* Faccia POSTERIORE (Visibile inizialmente) */}
+                    {/* Faccia POSTERIORE */}
                     <div className="card-face card-back">
                         <img
                             src={backImageUrl}
@@ -40,15 +40,37 @@ const CardFlip = ({ carta, index }) => {
                         />
                     </div>
 
-                    {/* Faccia ANTERIORE (Rivelata al click) */}
-                    <div className={`card-face card-front card-content`}>
+                    {/* Faccia ANTERIORE */}
+                    <div className="card-face card-front position-relative"> {/* Bootstrap: position-relative */}
                         <img
-                            src={carta.immagineUrl}
+                            src={imageUrl}
                             alt={carta.nome}
-                            className="rounded-lg border-2 border-gray-700 max-w-full h-auto object-cover"
+                            className="img-fluid rounded border border-secondary" // Bootstrap
                             style={{ width: "100%", aspectRatio: "1/1.4" }}
                             onError={(e) => { e.target.onerror = null; e.target.src = "https://placehold.co/150x210/606060/FFFFFF?text=Card"; }}
                         />
+
+                        {/* Contenitore per i badge del prezzo e foil */}
+                        <div className="position-absolute top-0 start-0 w-100 p-2 d-flex justify-content-between align-items-start" style={{ zIndex: 10 }}>
+
+                            {/* BADGE FOIL (Arcobaleno) */}
+                            {isFoil && (
+                                <span className="foil-badge badge rounded-pill shadow">
+                                    FOIL
+                                </span>
+                            )}
+
+                            {/* BADGE PREZZO */}
+                            {carta.price && carta.price !== 'N/A' ? (
+                                <span className="price-badge badge rounded-pill bg-success text-dark shadow ms-auto">
+                                    € {carta.price}
+                                </span>
+                            ) : (
+                                <span className="price-badge badge rounded-pill bg-secondary text-white shadow ms-auto">
+                                    N/A
+                                </span>
+                            )}
+                        </div>
                     </div>
                 </div>
             </div>
@@ -61,13 +83,11 @@ const CardFlip = ({ carta, index }) => {
 function PacksDettail() {
     const { slug } = useParams();
     const navigate = useNavigate();
-    // Inizializza data come oggetto, assumendo che l'API restituisca un oggetto con contents
     const [data, setData] = useState({});
     const [loading, setLoading] = useState(true);
 
     const fetchPack = () => {
         setLoading(true);
-        // Resetta i dati quando inizia un nuovo fetch
         setData({});
         axios.get(`http://localhost:3000/set/open/${slug}`)
             .then((response) => {
@@ -81,12 +101,10 @@ function PacksDettail() {
     };
 
     useEffect(() => {
-        // La dipendenza [slug] garantisce che venga chiamato solo quando la route cambia
         fetchPack();
     }, [slug]);
 
     const handleOpenAnother = () => {
-        // Richiama fetchPack per aprire un altro pacchetto
         fetchPack();
     };
 
@@ -95,25 +113,19 @@ function PacksDettail() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-900 text-white p-4 sm:p-8">
+        <div className="container min-vh-100 text-white p-4 p-sm-5">
 
-            {/* Il blocco <style> è stato rimosso e gli stili sono in index.css */}
-
-
-            {/* Utilizzo di Tailwind per header/bottoni per mantenere lo stile pulito */}
-            <div className="flex flex-col sm:flex-row justify-between items-center mb-8 bg-gray-800 p-4 rounded-xl shadow-lg">
-                <h1 className="text-2xl font-bold mb-4 sm:mb-0">Pacchetto aperto: {data.set_code || slug?.toUpperCase()}</h1>
-                <div className="flex space-x-3 action-buttons">
-                    {/* AGGIORNATO: Classe personalizzata per il bottone 'Indietro' */}
+            <div className="d-flex flex-column flex-sm-row justify-content-between align-items-center mb-4 bg-secondary p-3 rounded shadow">
+                <h1 className="h4 mb-3 mb-sm-0">Pacchetto aperto: {data.set_code || slug?.toUpperCase()}</h1>
+                <div className="d-flex action-buttons">
                     <button
-                        className="btn-action btn-go-back"
+                        className="btn btn-action btn-go-back me-2"
                         onClick={handleGoBack}
                     >
-                        <span className="mr-2">←</span> Scegli altro pacchetto
+                        <span className="me-2">←</span> Scegli altro pacchetto
                     </button>
-                    {/* AGGIORNATO: Classe personalizzata per il bottone 'Apri' */}
                     <button
-                        className="btn-action btn-open-pack"
+                        className="btn btn-action btn-open-pack"
                         onClick={handleOpenAnother}
                         disabled={loading}
                     >
@@ -130,8 +142,7 @@ function PacksDettail() {
                     <p className="loading-text">Aprendo il pacchetto...</p>
                 </div>
             ) : (
-                // AGGIORNATO: Rimosse le classi di colonna Tailwind per usare interamente il CSS in index.css
-                <div className="grid cards-grid gap-6"> 
+                <div className="cards-grid">
                     {data.contents && data.contents.map((carta, index) => (
                         <CardFlip key={index} carta={carta} index={index} />
                     ))}
