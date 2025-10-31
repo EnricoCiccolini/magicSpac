@@ -1,9 +1,11 @@
-import axios from "axios";
-import { useEffect, useState } from "react";
+// Rimosse le importazioni non necessarie: useEffect, useState, useCallback
+import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import useOpen from "../hook/useOpen"; // Importa il custom hook
 
 // --- Sottocomponente per la Carta con Effetto Flip ---
 const CardFlip = ({ carta, index }) => {
+    // useState è necessario solo qui, all'interno del sottocomponente.
     const [isFlipped, setIsFlipped] = useState(false);
     const isFoil = carta.foil === true;
 
@@ -83,28 +85,12 @@ const CardFlip = ({ carta, index }) => {
 function PacksDettail() {
     const { slug } = useParams();
     const navigate = useNavigate();
-    const [data, setData] = useState({});
-    const [loading, setLoading] = useState(true);
 
-    const fetchPack = () => {
-        setLoading(true);
-        setData({});
-        axios.get(`http://localhost:3000/set/open/${slug}`)
-            .then((response) => {
-                setData(response.data);
-                setLoading(false);
-            })
-            .catch((error) => {
-                console.error("Error fetching pack details:", error);
-                setLoading(false);
-            });
-    };
-
-    useEffect(() => {
-        fetchPack();
-    }, [slug]);
+    // 🎣 Sostituisci useState e useEffect per il fetch con il custom hook
+    const { data, loading, fetchPack } = useOpen(slug);
 
     const handleOpenAnother = () => {
+        // Chiama la funzione fornita dal custom hook per rifare il fetch
         fetchPack();
     };
 
