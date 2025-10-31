@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { usePacks } from "../hook/usePacks";
 import PackCard from "../components/PacksCard";
-import PaginationControls from "./PaginationControls";
+import PaginationControls from "../components/PaginationControls";
 
 function PacksPage() {
   const {
