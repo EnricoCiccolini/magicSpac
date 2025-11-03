@@ -131,15 +131,20 @@ function PacksDettail() {
   }, [openedPackData, setOpenedPackData, slug]);
 
 
-  // SINCRONIZZAZIONE (Invariata, ha funzionato per risolvere il loop)
+  // SINCRONIZZAZIONE (MODIFICATA per non bloccare il fetch forzato)
   useEffect(() => {
+    // 1. Controlliamo che ci siano dati validi dal hook
     if (hookData && hookData.contents && hookData.contents.length > 0) {
       
-      if (openedPackData && openedPackData.slug === slug && forceRefetch === 0) {
-          // Se i dati sono già persistiti e NON stiamo forzando un refetch, usciamo.
+      // 2. Logica per *non* sovrascrivere dati persistenti a meno che non stiamo forzando
+      const isPersistentDataValid = openedPackData && openedPackData.slug === slug;
+      
+      // Se ci sono dati persistenti validi E NON stiamo forzando un fetch, non facciamo nulla (usciamo).
+      if (isPersistentDataValid && forceRefetch === 0) {
           return; 
       }
       
+      // Se arriviamo qui, i dati vanno salvati: o non c'erano dati persistenti, o stavamo forzando.
       const contentsWithState = hookData.contents.map(card => ({
         ...card,
         isFlipped: false 
@@ -148,12 +153,13 @@ function PacksDettail() {
       const newData = { ...hookData, contents: contentsWithState };
       
       setOpenedPackData({ slug: slug, data: newData });
-      // Dopo aver salvato il nuovo pacchetto, resettiamo forceRefetch per tornare al comportamento normale
+      
+      // Dopo aver salvato il nuovo pacchetto, resettiamo forceRefetch
       if (forceRefetch > 0) {
         setForceRefetch(0); 
       }
     }
-  }, [hookData, slug, setOpenedPackData, openedPackData, forceRefetch]); // Aggiunto forceRefetch
+  }, [hookData, slug, setOpenedPackData, openedPackData, forceRefetch]);
 
   
   const handleOpenAnother = () => {
@@ -163,7 +169,7 @@ function PacksDettail() {
     // 2. Resetta i dati persistenti per pulire il contesto e forzare la visualizzazione del loading.
     setOpenedPackData(null); 
     
-    // 3. Chiama la funzione di fetch per aprire un NUOVO pacchetto (che usa il nuovo stato forceRefetch)
+    // 3. Chiama la funzione di fetch per aprire un NUOVO pacchetto
     fetchNewPack(); 
   };
 
