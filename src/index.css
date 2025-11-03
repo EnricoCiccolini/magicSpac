@@ -1017,3 +1017,213 @@ h1 {
         margin-right: auto;
     }
 }
+
+/* --- Card Detail Page (DettailCard) --- */
+.card-detail-page {
+    padding-top: 4rem;
+    padding-bottom: 4rem;
+    /* CENTRATURA */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.card-detail-wrapper {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    border: 3px solid #e94560;
+    max-width: 900px; /* Imposta una larghezza massima per la centratura */
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.card-detail-image-container {
+    padding: 20px;
+    background: #1a1a2e;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.card-detail-image {
+    width: 100%;
+    max-width: 350px; /* Limit max size on large screens */
+    height: auto;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+    transition: transform 0.3s ease;
+}
+
+.card-detail-image:hover {
+    transform: scale(1.02);
+}
+
+.card-detail-info {
+    color: #fff;
+}
+
+/* Aumento Font Size e miglioramento contrasto */
+.card-detail-name {
+    font-size: 3.5rem; /* Aumentato */
+    font-weight: bold;
+    color: #fff; /* Bianco puro per maggiore stacco */
+    margin-bottom: 10px;
+    text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.8);
+    border-bottom: 2px solid #e94560;
+    padding-bottom: 5px;
+}
+
+/* Aumento Font Size */
+.card-detail-type {
+    font-size: 1.5rem; /* Aumentato */
+    font-style: italic;
+    color: #c0c0c0;
+    margin-bottom: 20px;
+}
+
+.card-detail-section {
+    background: rgba(0, 0, 0, 0.5); /* Aumentato l'opacità per stacco maggiore */
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    border-left: 5px solid #e94560; /* Usiamo il rosso per staccare */
+}
+
+/* Aumento Font Size e miglioramento contrasto */
+.card-detail-section h4 {
+    color: #fff;
+    font-weight: 700; /* Più audace */
+    margin-bottom: 5px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.4); /* Linea più visibile */
+    padding-bottom: 5px;
+    font-size: 1.3rem; /* Aumentato */
+}
+
+/* Aumento Font Size e miglioramento contrasto */
+.card-detail-text {
+    white-space: pre-wrap;
+    color: #fff; /* Bianco puro per maggiore stacco */
+    font-size: 1.1rem; /* Aumentato */
+    line-height: 1.6; /* Interlinea maggiore */
+}
+
+.card-detail-text p {
+    margin-bottom: 0.5rem;
+}
+
+/* Specific details (Price, Rarity, Artist, Set) */
+.card-detail-meta {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 15px; /* Aumentato lo spazio */
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.card-detail-meta-item {
+    padding: 10px 20px; /* Aumentato il padding */
+    border-radius: 25px; /* Più arrotondato */
+    font-weight: 700;
+    flex-grow: 1;
+    text-align: center;
+    min-width: 180px; /* Larghezza minima maggiore */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+    font-size: 1.1rem; /* Aumentato il font */
+}
+
+/* --- CLASSI DI PREZZO DINAMICHE --- */
+
+/* Prezzo LOW: < 1€ (Grigio) */
+.price-low {
+    background-color: #6c757d; /* Grigio scuro */
+    color: #fff;
+}
+
+/* Prezzo MEDIUM: 1€ - 10€ (Oro) */
+.price-medium {
+    background-color: #FFD700; /* Oro */
+    color: #1a1a2e; /* Testo scuro */
+    border-color: #f1c40f;
+}
+
+/* Prezzo HIGH: > 10€ (Effetto Foil) */
+.price-high {
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(135deg, #FFD700 0%, #ff4500 100%); /* Gradiente di base Oro/Arancio */
+    color: #fff;
+    border: 3px solid #ff4500;
+    box-shadow: 0 0 15px rgba(255, 69, 0, 0.8);
+    z-index: 1;
+}
+
+/* Effetto particellare per price-high */
+.price-high::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: repeating-linear-gradient(45deg,
+            rgba(255, 255, 255, 0.2) 0,
+            rgba(255, 255, 255, 0.2) 1px,
+            transparent 1px,
+            transparent 5px);
+    animation: particle-shift 5s linear infinite;
+    pointer-events: none;
+    z-index: 2;
+    mix-blend-mode: overlay;
+    opacity: 0.8;
+}
+
+.price-high:hover {
+    transform: translateY(-3px) scale(1.03);
+    box-shadow: 0 8px 20px rgba(255, 69, 0, 1);
+}
+
+@keyframes particle-shift {
+    0% {
+        transform: translate(0, 0) rotate(0deg);
+    }
+
+    100% {
+        transform: translate(50px, 50px) rotate(360deg);
+    }
+}
+
+/* Fine CLASSI DI PREZZO DINAMICHE */
+
+
+.card-detail-rarity-common { background-color: #A9A9A9; color: #1a1a2e; }
+.card-detail-rarity-uncommon { background-color: #3498db; color: #fff; }
+.card-detail-rarity-rare { background-color: #e74c3c; color: #fff; }
+.card-detail-rarity-mythic { background-color: #f1c40f; color: #1a1a2e; }
+
+/* Responsive adjustments for detail page */
+@media (min-width: 992px) {
+    .card-detail-wrapper {
+        display: flex;
+        gap: 30px;
+    }
+
+    .card-detail-image-container {
+        flex: 0 0 350px;
+        margin-bottom: 0;
+    }
+
+    .card-detail-info {
+        flex-grow: 1;
+    }
+}

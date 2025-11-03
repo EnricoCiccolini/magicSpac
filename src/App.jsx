@@ -1,17 +1,26 @@
-import { BrowserRouter, Route, Routes } from "react-router-dom"
-import HomePage from "./pages/Homepage"
-import PacksPage from "./pages/PacksPage"
-import PacksDettail from "./pages/PacksDettailPage"
-import NotFoundPage from "./pages/NotFoundPage"
-import MainLayout from "./layouts/MainLayout"
-import DettailCard from "./pages/DettailCard"
-
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { useState, useMemo } from "react";
+import GlobalContext from "./context/GlobalContext";
+import MainLayout from "./layouts/MainLayout";
+import HomePage from "./pages/Homepage";
+import PacksPage from "./pages/PacksPage";
+import PacksDettail from "./pages/PacksDettailPage";
+import DettailCard from "./pages/DettailCard";
+import NotFoundPage from "./pages/NotFoundPage";
 
 function App() {
+  const [detail, setDetail] = useState({});
+  const [openedPackData, setOpenedPackData] = useState(null);
 
+  const contextValue = useMemo(() => ({ 
+      detail, 
+      setDetail, 
+      openedPackData, 
+      setOpenedPackData // Aggiunto
+  }), [detail, openedPackData]);
 
   return (
-    <>
+    <GlobalContext.Provider value={contextValue}>
       <BrowserRouter>
         <Routes>
           <Route element={<MainLayout />}>
@@ -23,9 +32,8 @@ function App() {
           </Route>
         </Routes>
       </BrowserRouter>
-
-    </>
-  )
+    </GlobalContext.Provider>
+  );
 }
 
-export default App
+export default App;
