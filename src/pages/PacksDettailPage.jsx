@@ -1,7 +1,8 @@
 // Rimosse le importazioni non necessarie: useEffect, useState, useCallback
 import { useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import useOpen from "../hook/useOpen"; // Importa il custom hook
+
 
 // --- Sottocomponente per la Carta con Effetto Flip ---
 const CardFlip = ({ carta, index }) => {
@@ -44,35 +45,37 @@ const CardFlip = ({ carta, index }) => {
 
                     {/* Faccia ANTERIORE */}
                     <div className="card-face card-front position-relative"> {/* Bootstrap: position-relative */}
-                        <img
-                            src={imageUrl}
-                            alt={carta.nome}
-                            className="img-fluid rounded border border-secondary" // Bootstrap
-                            style={{ width: "100%", aspectRatio: "1/1.4" }}
-                            onError={(e) => { e.target.onerror = null; e.target.src = "https://placehold.co/150x210/606060/FFFFFF?text=Card"; }}
-                        />
+                        <Link to={`/packs/${carta.set_code}/${encodeURIComponent(carta.nome)}`}>
+                            <img
+                                src={imageUrl}
+                                alt={carta.nome}
+                                className="img-fluid rounded border border-secondary" // Bootstrap
+                                style={{ width: "100%", aspectRatio: "1/1.4" }}
+                                onError={(e) => { e.target.onerror = null; e.target.src = "https://placehold.co/150x210/606060/FFFFFF?text=Card"; }}
+                            />
 
-                        {/* Contenitore per i badge del prezzo e foil */}
-                        <div className="position-absolute top-0 start-0 w-100 p-2 d-flex justify-content-between align-items-start" style={{ zIndex: 10 }}>
+                            {/* Contenitore per i badge del prezzo e foil */}
+                            <div className="position-absolute top-0 start-0 w-100 p-2 d-flex justify-content-between align-items-start" style={{ zIndex: 10 }}>
 
-                            {/* BADGE FOIL (Arcobaleno) */}
-                            {isFoil && (
-                                <span className="foil-badge badge rounded-pill shadow">
-                                    FOIL
-                                </span>
-                            )}
+                                {/* BADGE FOIL (Arcobaleno) */}
+                                {isFoil && (
+                                    <span className="foil-badge badge rounded-pill shadow">
+                                        FOIL
+                                    </span>
+                                )}
 
-                            {/* BADGE PREZZO */}
-                            {carta.price && carta.price !== 'N/A' ? (
-                                <span className="price-badge badge rounded-pill bg-success text-dark shadow ms-auto">
-                                    € {carta.price}
-                                </span>
-                            ) : (
-                                <span className="price-badge badge rounded-pill bg-secondary text-white shadow ms-auto">
-                                    N/A
-                                </span>
-                            )}
-                        </div>
+                                {/* BADGE PREZZO */}
+                                {carta.price && carta.price !== 'N/A' ? (
+                                    <span className="price-badge badge rounded-pill bg-success text-dark shadow ms-auto">
+                                        € {carta.price}
+                                    </span>
+                                ) : (
+                                    <span className="price-badge badge rounded-pill bg-secondary text-white shadow ms-auto">
+                                        N/A
+                                    </span>
+                                )}
+                            </div>
+                        </Link>
                     </div>
                 </div>
             </div>
