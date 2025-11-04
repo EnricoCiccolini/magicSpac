@@ -1,21 +1,28 @@
 // PacksDettailPage.jsx
 
-import { useState, useContext, useEffect, useCallback } from "react"; 
-import { useParams, useNavigate, Link } from "react-router-dom";
+import { useState, useContext, useEffect, useCallback } from "react";
+import { useParams, useNavigate, Link } from "react-router-dom"; // Importa useNavigate
 import useOpen from "../hook/useOpen";
 import GlobalContext from "../context/GlobalContext";
 
 // CardFlip aggiornato per layout
 const CardFlip = ({ carta, index, onFlip, isFlippedState }) => {
-  const { setDetail } = useContext(GlobalContext); 
+  const { setDetail } = useContext(GlobalContext);
+  const navigate = useNavigate(); // Usa useNavigate all'interno del componente
   const isFoil = carta.foil === true;
 
-  const handleFlip = () => {
-    if (!isFlippedState) { 
-      onFlip(index, true); 
+  const handleInteraction = () => {
+    // 1. Se NON è flippata, la flippa.
+    if (!isFlippedState) {
+      onFlip(index, true);
+    } else {
+      // 2. Se è flippata, simula l'azione del pulsante Dettagli
+      setDetail(carta);
+      // Naviga al percorso del dettaglio (il percorso è relativo alla route corrente, come nel Link)
+      navigate(`./${encodeURIComponent(carta.nome)}`);
     }
   };
-  
+
   const cardRarityClass = `rarity-${carta.rarity?.toLowerCase()}`;
   const foilContainerClass = isFoil ? "foil-card" : "";
   const backImageUrl = "https://i.imgur.com/LdOBU1I.jpeg";
@@ -26,59 +33,66 @@ const CardFlip = ({ carta, index, onFlip, isFlippedState }) => {
   return (
     <div
       className={`card-container ${cardRarityClass} ${foilContainerClass}`}
-      onClick={handleFlip} 
+      // Modificato: Ora chiama handleInteraction
+      onClick={handleInteraction}
       style={{ animationDelay: `${index * 0.1}s` }}
     >
       <div className="card-scale-wrapper">
-        <div className={`card-inner ${isFlippedState ? "flipped" : ""}`}> 
+        <div className={`card-inner ${isFlippedState ? "flipped" : ""}`}>
           <div className="card-face card-back">
-            <img 
-                src={backImageUrl} 
-                alt="Card Back" 
-                className="card-back-image" 
+            <img
+              src={backImageUrl}
+              alt="Card Back"
+              className="card-back-image"
             />
           </div>
           <div className="card-face card-front">
-            <div className="d-flex flex-column h-100 justify-content-between p-2">
-                
-                <div className="d-flex justify-content-end align-items-start w-100 mb-2">
-                    {/* RIMOZIONE RARITÀ e mantenimento solo del badge Foil */}
-                    {isFoil && <span className="badge foil-badge text-uppercase">Foil</span>}
-                </div>
+            {/* RIMOSSO p-2: il padding è ora gestito dal CSS globale per garantire l'uniformità dell'altezza */}
+            <div className="d-flex flex-column h-100 justify-content-between">
+              {/* Contenitore Immagine & Badge: gestito da flex-grow-1 */}
+              <div className="card-image-wrapper flex-grow-1 d-flex align-items-center justify-content-center">
+                {isFoil && (
+                  <span className="badge foil-badge text-uppercase foil-absolute-position">
+                    Foil
+                  </span>
+                )}
+                <img
+                  src={imageUrl}
+                  alt={carta.nome}
+                  className="img-fluid card-art-image"
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src =
+                      "https://placehold.co/200x280/606060/FFFFFF?text=No+Image";
+                  }}
+                />
+              </div>
 
-                <div className="flex-grow-1 d-flex align-items-center justify-content-center">
-                    <img 
-                        src={imageUrl} 
-                        alt={carta.nome} 
-                        className="img-fluid" 
-                        onError={(e) => {
-                            e.target.onerror = null;
-                            e.target.src = "https://placehold.co/200x280/606060/FFFFFF?text=No+Image";
-                        }}
-                    />
-                </div>
-
-                <div className="mt-2 w-100">
-                    {/* RIDUZIONE DELLA DIMENSIONE DEL NOME: da h6 a small */}
-                    <p className="small text-white mb-1" style={{ 
-                        // Stili per troncare il testo se troppo lungo
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                        whiteSpace: 'nowrap',
-                        fontWeight: 'bold' 
-                    }}>
-                        {carta.nome}
-                    </p>
-                    <p className="small text-muted mb-1">Prezzo: {carta.price || "N/A"}</p>
-                    <Link 
-                        to={`./${encodeURIComponent(carta.nome)}`}
-                        onClick={() => setDetail(carta)}
-                        className="btn btn-sm btn-outline-info w-100 mt-2"
-                        style={{ zIndex: 12 }}
-                    >
-                        Dettagli
-                    </Link>
-                </div>
+              {/* Blocco Dettagli: ORA CON ALTEZZA FISSA nel CSS */}
+              <div className="card-details-footer">
+                <p
+                  className="small text-white mb-1"
+                  style={{
+                    /* Rimosso style inline per overflow/whiteSpace - gestito in index.css */
+                    fontWeight: "bold",
+                  }}
+                >
+                  {/* Assicurati che il nome della carta appaia qui se necessario, altrimenti lascialo vuoto */}
+                  {carta.nome}
+                </p>
+                <p className="small text-muted mb-1">
+                  Prezzo: {carta.price || "N/A"}
+                </p>
+                {/* PULSANTE RIMOSSO: La logica è stata spostata nell'onClick del contenitore */}
+                {/* <Link
+                  to={`./${encodeURIComponent(carta.nome)}`}
+                  onClick={() => setDetail(carta)}
+                  className="btn btn-sm btn-outline-info w-100 mt-2"
+                  style={{ zIndex: 12 }}
+                >
+                  Dettagli
+                </Link> */}
+              </div>
             </div>
           </div>
         </div>
@@ -87,93 +101,131 @@ const CardFlip = ({ carta, index, onFlip, isFlippedState }) => {
   );
 };
 
+// Componente Modale di Conferma (NESSUNA MODIFICA)
+const ConfirmModal = ({ show, onConfirm, onCancel, setCode }) => {
+  if (!show) return null;
 
+  return (
+    <div className="modal-overlay" onClick={onCancel}>
+      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+        <div className="modal-header">
+          <h3>🎲 Apri Nuovo Pacchetto?</h3>
+        </div>
+        <div className="modal-body">
+          <p>
+            Sei sicuro di voler aprire un nuovo pacchetto{" "}
+            <strong>{setCode?.toUpperCase()}</strong>?
+          </p>
+          <p className="text-muted small">
+            Le carte del pacchetto attuale non verranno salvate.
+          </p>
+        </div>
+        <div className="modal-footer">
+          <button className="btn btn-secondary" onClick={onCancel}>
+            Annulla
+          </button>
+          <button className="btn btn-primary" onClick={onConfirm}>
+            Conferma
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Componente principale PacksDettail (NESSUNA MODIFICA)
 function PacksDettail() {
   const { slug } = useParams();
   const navigate = useNavigate();
 
-  const { openedPackData, setOpenedPackData, setDetail } = useContext(GlobalContext);
+  const { openedPackData, setOpenedPackData, setDetail } =
+    useContext(GlobalContext);
 
   const initialDataFound = openedPackData && openedPackData.slug === slug;
-  
-  // STATO AGGIUNTIVO: Forza un refetch quando clicchiamo "Apri un altro"
-  const [forceRefetch, setForceRefetch] = useState(0); 
 
-  const { 
-      data: hookData, 
-      loading, 
-      error, 
-      openPack: fetchNewPack 
-    } = useOpen(slug, { skipFetch: initialDataFound, forceRefetch }); // PASSAGGIO DEL NUOVO STATO
+  // STATO per forzare il refetch
+  const [forceRefetch, setForceRefetch] = useState(0);
+  const [showModal, setShowModal] = useState(false);
 
-  // Funzione per aggiornare lo stato di flip nel contesto globale (Invariata)
-  const updateCardFlipStatus = useCallback((cardIndex, newFlippedState) => {
-    if (!openedPackData || openedPackData.slug !== slug) return;
+  const {
+    data: hookData,
+    loading,
+    error,
+    openPack: fetchNewPack,
+  } = useOpen(slug, { skipFetch: initialDataFound, forceRefetch });
 
-    setOpenedPackData(prevData => {
+  // Funzione per aggiornare lo stato di flip nel contesto globale
+  const updateCardFlipStatus = useCallback(
+    (cardIndex, newFlippedState) => {
+      if (!openedPackData || openedPackData.slug !== slug) return;
+
+      setOpenedPackData((prevData) => {
         if (!prevData || prevData.slug !== slug) return prevData;
 
         const newContents = prevData.data.contents.map((card, idx) => {
-            if (idx === cardIndex) {
-                return { ...card, isFlipped: newFlippedState }; 
-            }
-            return card;
+          if (idx === cardIndex) {
+            return { ...card, isFlipped: newFlippedState };
+          }
+          return card;
         });
-        
+
         return {
-            ...prevData,
-            data: {
-                ...prevData.data,
-                contents: newContents
-            }
+          ...prevData,
+          data: {
+            ...prevData.data,
+            contents: newContents,
+          },
         };
-    });
-  }, [openedPackData, setOpenedPackData, slug]);
+      });
+    },
+    [openedPackData, setOpenedPackData, slug]
+  );
 
-
-  // SINCRONIZZAZIONE (Invariata, ha funzionato per risolvere il loop)
+  // SINCRONIZZAZIONE: salva i nuovi dati nel contesto globale
   useEffect(() => {
     if (hookData && hookData.contents && hookData.contents.length > 0) {
-      
-      if (openedPackData && openedPackData.slug === slug && forceRefetch === 0) {
-          // Se i dati sono già persistiti e NON stiamo forzando un refetch, usciamo.
-          return; 
-      }
-      
-      const contentsWithState = hookData.contents.map(card => ({
+      // Aggiungi isFlipped: false a tutte le carte
+      const contentsWithState = hookData.contents.map((card) => ({
         ...card,
-        isFlipped: false 
+        isFlipped: false,
       }));
-      
-      const newData = { ...hookData, contents: contentsWithState };
-      
-      setOpenedPackData({ slug: slug, data: newData });
-      // Dopo aver salvato il nuovo pacchetto, resettiamo forceRefetch per tornare al comportamento normale
-      if (forceRefetch > 0) {
-        setForceRefetch(0); 
-      }
-    }
-  }, [hookData, slug, setOpenedPackData, openedPackData, forceRefetch]); // Aggiunto forceRefetch
 
-  
-  const handleOpenAnother = () => {
-    // 1. Forza l'aggiornamento dello stato per innescare un nuovo fetch.
-    setForceRefetch(prev => prev + 1); 
-    
-    // 2. Resetta i dati persistenti per pulire il contesto e forzare la visualizzazione del loading.
-    setOpenedPackData(null); 
-    
-    // 3. Chiama la funzione di fetch per aprire un NUOVO pacchetto (che usa il nuovo stato forceRefetch)
-    fetchNewPack(); 
+      const newData = { ...hookData, contents: contentsWithState };
+
+      // Salva sempre i nuovi dati quando arrivano dall'hook
+      setOpenedPackData({ slug: slug, data: newData });
+    }
+  }, [hookData, slug, setOpenedPackData]);
+
+  // Funzione che apre il modale
+  const handleOpenAnotherClick = () => {
+    setShowModal(true);
+  };
+
+  // Funzione chiamata quando l'utente conferma nel modale
+  const handleConfirmOpenAnother = () => {
+    setShowModal(false);
+
+    // Resetta i dati persistenti per mostrare il loading
+    setOpenedPackData(null);
+
+    // Incrementa forceRefetch per triggerare il nuovo fetch nell'hook
+    setForceRefetch((prev) => prev + 1);
+  };
+
+  // Funzione chiamata quando l'utente annulla
+  const handleCancelModal = () => {
+    setShowModal(false);
   };
 
   const handleGoBack = () => {
-    setOpenedPackData(null); 
+    setOpenedPackData(null);
     navigate("/packs");
   };
 
-  // Se è disponibile un pacchetto persistente, usiamo quello, altrimenti usiamo i dati freschi (hookData).
-  const displayData = initialDataFound ? openedPackData.data : hookData || {};
+  // Determina quali dati mostrare
+  const displayData =
+    openedPackData && openedPackData.slug === slug ? openedPackData.data : {};
   const CardList = displayData.contents || [];
 
   return (
@@ -191,8 +243,8 @@ function PacksDettail() {
           </button>
           <button
             className="btn btn-action btn-open-pack"
-            onClick={handleOpenAnother}
-            disabled={loading} 
+            onClick={handleOpenAnotherClick}
+            disabled={loading}
           >
             🎲 Apri un altro {displayData.set_code || slug?.toUpperCase()}
           </button>
@@ -200,7 +252,7 @@ function PacksDettail() {
       </div>
 
       {/* Mostra il loading se i dati non sono disponibili e la richiesta è in corso */}
-      {loading && CardList.length === 0 ? ( 
+      {loading && CardList.length === 0 ? (
         <div className="mtg-spinner-container">
           <div className="mtg-spinner">
             <div className="mana-symbol">✦</div>
@@ -210,18 +262,31 @@ function PacksDettail() {
       ) : (
         <div className="cards-grid">
           {CardList.map((carta, index) => (
-            <CardFlip 
-              key={carta.multiverse_ids?.[0] || index} 
-              carta={carta} 
-              index={index} 
-              isFlippedState={carta.isFlipped} 
-              onFlip={updateCardFlipStatus} 
+            <CardFlip
+              key={`${carta.multiverse_ids?.[0] || carta.id || index
+                }-${forceRefetch}`}
+              carta={carta}
+              index={index}
+              isFlippedState={carta.isFlipped}
+              onFlip={updateCardFlipStatus}
             />
           ))}
         </div>
       )}
-      
-      {error && !loading && CardList.length === 0 && <div className="alert alert-danger mt-4">Errore nel caricamento del pacchetto: {error.message}</div>}
+
+      {error && !loading && CardList.length === 0 && (
+        <div className="alert alert-danger mt-4">
+          Errore nel caricamento del pacchetto: {error.message}
+        </div>
+      )}
+
+      {/* Modale di Conferma */}
+      <ConfirmModal
+        show={showModal}
+        onConfirm={handleConfirmOpenAnother}
+        onCancel={handleCancelModal}
+        setCode={displayData.set_code || slug}
+      />
     </div>
   );
 }

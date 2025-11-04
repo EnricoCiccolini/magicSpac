@@ -145,6 +145,7 @@ select:focus {
     animation: fadeInUp 0.5s ease forwards;
     opacity: 0;
     overflow: hidden;
+    /* AGGIUNTO: Impedisce al contenuto di uscire dal card */
 }
 
 /* Pack selection cards (PacksPage) */
@@ -156,6 +157,8 @@ select:focus {
     gap: 15px;
     width: 100%;
     min-width: 0;
+    /* AGGIUSTAMENTO CHIAVE: Altezza fissa per uniformità */
+    height: 400px;
 }
 
 .card.pack-card h2 {
@@ -165,13 +168,31 @@ select:focus {
     overflow-wrap: break-word;
     hyphens: auto;
     font-size: 1.5rem;
+    /* AGGIUNTO: Limita il titolo a 2 righe per non farlo uscire */
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    /* Limita a 2 righe */
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .card.pack-card .pack-icon {
-    max-width: 6rem;
-    height: auto;
+    /* AGGIUSTAMENTO CHIAVE: Forze l'uniformità delle dimensioni dell'immagine */
+    width: 100%;
+    max-width: 8rem;
+    height: 8rem;
+    object-fit: contain;
+    /* Garantisce che l'icona sia interamente visibile */
     margin: 10px 0;
 }
+
+/* Assicurati che il pulsante sia posizionato in fondo se usi space-between */
+.card.pack-card .btn {
+    margin-top: auto;
+    /* Spinge il bottone in basso */
+}
+
 
 /* Pack Cards with Holographic Effect - ONLY FOR JOLLY SLOT */
 .card.foil-card {
@@ -461,7 +482,9 @@ select:focus {
     text-overflow: ellipsis;
 
     display: flex;
-    align-items: center;
+    /* CORREZIONE: Allinea il titolo in alto all'interno del suo spazio */
+    align-items: flex-start;
+    /* MODIFICATO */
     justify-content: center;
     text-align: center;
     line-height: 1.3;
@@ -836,6 +859,48 @@ h1 {
     background: #1f2937;
 }
 
+/* --- FIX PER L'ALTEZZA UNIFORME DELLE CARTE FLIPPABILI --- */
+
+/* Wrapper per l'immagine all'interno del card-front */
+.card-image-wrapper {
+    position: relative;
+    width: 100%;
+    margin-bottom: 0;
+    padding: 0 5px;
+    flex-grow: 1;
+    /* AGGIUNTA CHIAVE: Occupa tutto lo spazio disponibile */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Immagine d'Arte (Dimensione fissa all'interno del wrapper) */
+.card-art-image {
+    width: 100%;
+    height: 100%;
+    /* FORZA L'IMMAGINE A OCCUPARE TUTTO LO SPAZIO VERTICALE ASSEGNATO */
+    object-fit: contain;
+    /* Garantisce che l'immagine sia completamente visibile */
+    transition: none;
+    filter: none;
+    transform: none;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 100%;
+    /* RIMOZIONE: height: auto !important; (o simili) */
+}
+
+/* Blocco Dettagli Inferiore - Altezza Fissa */
+.card-details-footer {
+    width: 100%;
+    padding: 5px 10px 10px 10px;
+    /* Assicura che l'altezza sia minima o fissa per non influire sulla crescita dell'immagine */
+    flex-shrink: 0;
+}
+
+/* --- FINE FIX ALTEZZA UNIFORME --- */
+
 /* FIX HOVER: Applica lo scale al wrapper e ripristina la rotazione se flipped */
 .card-container:hover .card-scale-wrapper {
     transform: scale(1.03);
@@ -864,6 +929,13 @@ h1 {
 
 /* Stile per il badge Foil con effetto rainbow */
 .foil-badge {
+    position: absolute;
+    /* FIX: Posizionamento assoluto per la corretta collocazione */
+    top: 5px;
+    /* FIX: Offset dall'alto */
+    right: 15px;
+    /* FIX: Offset da destra */
+
     /* Rimuovi la classe Bootstrap bg-* per usare la sfumatura */
     background: linear-gradient(45deg,
             #ff0000,
@@ -1035,7 +1107,8 @@ h1 {
     padding: 30px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
     border: 3px solid #e94560;
-    max-width: 900px; /* Imposta una larghezza massima per la centratura */
+    max-width: 900px;
+    /* Imposta una larghezza massima per la centratura */
     width: 100%;
     margin-left: auto;
     margin-right: auto;
@@ -1054,7 +1127,8 @@ h1 {
 
 .card-detail-image {
     width: 100%;
-    max-width: 350px; /* Limit max size on large screens */
+    max-width: 350px;
+    /* Limit max size on large screens */
     height: auto;
     border-radius: 10px;
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
@@ -1071,9 +1145,11 @@ h1 {
 
 /* Aumento Font Size e miglioramento contrasto */
 .card-detail-name {
-    font-size: 3.5rem; /* Aumentato */
+    font-size: 3.5rem;
+    /* Aumentato */
     font-weight: bold;
-    color: #fff; /* Bianco puro per maggiore stacco */
+    color: #fff;
+    /* Bianco puro per maggiore stacco */
     margin-bottom: 10px;
     text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.8);
     border-bottom: 2px solid #e94560;
@@ -1082,36 +1158,45 @@ h1 {
 
 /* Aumento Font Size */
 .card-detail-type {
-    font-size: 1.5rem; /* Aumentato */
+    font-size: 1.5rem;
+    /* Aumentato */
     font-style: italic;
     color: #c0c0c0;
     margin-bottom: 20px;
 }
 
 .card-detail-section {
-    background: rgba(0, 0, 0, 0.5); /* Aumentato l'opacità per stacco maggiore */
+    background: rgba(0, 0, 0, 0.5);
+    /* Aumentato l'opacità per stacco maggiore */
     padding: 15px;
     border-radius: 10px;
     margin-bottom: 15px;
-    border-left: 5px solid #e94560; /* Usiamo il rosso per staccare */
+    border-left: 5px solid #e94560;
+    /* Usiamo il rosso per staccare */
 }
 
 /* Aumento Font Size e miglioramento contrasto */
 .card-detail-section h4 {
     color: #fff;
-    font-weight: 700; /* Più audace */
+    font-weight: 700;
+    /* Più audace */
     margin-bottom: 5px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.4); /* Linea più visibile */
+    border-bottom: 1px solid rgba(255, 255, 255, 0.4);
+    /* Linea più visibile */
     padding-bottom: 5px;
-    font-size: 1.3rem; /* Aumentato */
+    font-size: 1.3rem;
+    /* Aumentato */
 }
 
 /* Aumento Font Size e miglioramento contrasto */
 .card-detail-text {
     white-space: pre-wrap;
-    color: #fff; /* Bianco puro per maggiore stacco */
-    font-size: 1.1rem; /* Aumentato */
-    line-height: 1.6; /* Interlinea maggiore */
+    color: #fff;
+    /* Bianco puro per maggiore stacco */
+    font-size: 1.1rem;
+    /* Aumentato */
+    line-height: 1.6;
+    /* Interlinea maggiore */
 }
 
 .card-detail-text p {
@@ -1123,37 +1208,45 @@ h1 {
     display: flex;
     justify-content: space-between;
     flex-wrap: wrap;
-    gap: 15px; /* Aumentato lo spazio */
+    gap: 15px;
+    /* Aumentato lo spazio */
     margin-top: 20px;
     padding-top: 15px;
     border-top: 1px solid rgba(255, 255, 255, 0.4);
 }
 
 .card-detail-meta-item {
-    padding: 10px 20px; /* Aumentato il padding */
-    border-radius: 25px; /* Più arrotondato */
+    padding: 10px 20px;
+    /* Aumentato il padding */
+    border-radius: 25px;
+    /* Più arrotondato */
     font-weight: 700;
     flex-grow: 1;
     text-align: center;
-    min-width: 180px; /* Larghezza minima maggiore */
+    min-width: 180px;
+    /* Larghezza minima maggiore */
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
     transition: all 0.3s ease;
     border: 2px solid transparent;
-    font-size: 1.1rem; /* Aumentato il font */
+    font-size: 1.1rem;
+    /* Aumentato il font */
 }
 
 /* --- CLASSI DI PREZZO DINAMICHE --- */
 
 /* Prezzo LOW: < 1€ (Grigio) */
 .price-low {
-    background-color: #6c757d; /* Grigio scuro */
+    background-color: #6c757d;
+    /* Grigio scuro */
     color: #fff;
 }
 
 /* Prezzo MEDIUM: 1€ - 10€ (Oro) */
 .price-medium {
-    background-color: #FFD700; /* Oro */
-    color: #1a1a2e; /* Testo scuro */
+    background-color: #FFD700;
+    /* Oro */
+    color: #1a1a2e;
+    /* Testo scuro */
     border-color: #f1c40f;
 }
 
@@ -1161,7 +1254,8 @@ h1 {
 .price-high {
     position: relative;
     overflow: hidden;
-    background: linear-gradient(135deg, #FFD700 0%, #ff4500 100%); /* Gradiente di base Oro/Arancio */
+    background: linear-gradient(135deg, #FFD700 0%, #ff4500 100%);
+    /* Gradiente di base Oro/Arancio */
     color: #fff;
     border: 3px solid #ff4500;
     box-shadow: 0 0 15px rgba(255, 69, 0, 0.8);
@@ -1206,10 +1300,25 @@ h1 {
 /* Fine CLASSI DI PREZZO DINAMICHE */
 
 
-.card-detail-rarity-common { background-color: #A9A9A9; color: #1a1a2e; }
-.card-detail-rarity-uncommon { background-color: #3498db; color: #fff; }
-.card-detail-rarity-rare { background-color: #e74c3c; color: #fff; }
-.card-detail-rarity-mythic { background-color: #f1c40f; color: #1a1a2e; }
+.card-detail-rarity-common {
+    background-color: #A9A9A9;
+    color: #1a1a2e;
+}
+
+.card-detail-rarity-uncommon {
+    background-color: #3498db;
+    color: #fff;
+}
+
+.card-detail-rarity-rare {
+    background-color: #e74c3c;
+    color: #fff;
+}
+
+.card-detail-rarity-mythic {
+    background-color: #f1c40f;
+    color: #1a1a2e;
+}
 
 /* Responsive adjustments for detail page */
 @media (min-width: 992px) {
@@ -1225,5 +1334,260 @@ h1 {
 
     .card-detail-info {
         flex-grow: 1;
+    }
+}
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.75);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    backdrop-filter: blur(5px);
+}
+
+.modal-content {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    border-radius: 15px;
+    border: 3px solid #e94560;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    max-width: 500px;
+    width: 90%;
+    animation: modalFadeIn 0.3s ease;
+}
+
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9) translateY(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.modal-header {
+    padding: 20px 25px;
+    border-bottom: 2px solid #e94560;
+}
+
+.modal-header h3 {
+    color: #fff;
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: bold;
+    text-align: center;
+}
+
+.modal-body {
+    padding: 25px;
+    color: #fff;
+}
+
+.modal-body p {
+    margin-bottom: 10px;
+    font-size: 1.1rem;
+}
+
+.modal-body strong {
+    color: #e94560;
+}
+
+.modal-footer {
+    padding: 20px 25px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    gap: 15px;
+    justify-content: flex-end;
+}
+
+.modal-footer .btn {
+    padding: 10px 25px;
+    border-radius: 25px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.modal-footer .btn-secondary {
+    background-color: #6c757d;
+    border: 2px solid #6c757d;
+    color: #fff;
+}
+
+.modal-footer .btn-secondary:hover {
+    background-color: #5a6268;
+    border-color: #545b62;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(108, 117, 125, 0.4);
+}
+
+.modal-footer .btn-primary {
+    background: linear-gradient(135deg, #20c997 0%, #28a745 100%);
+    border: 2px solid #28a745;
+    color: #fff;
+}
+
+.modal-footer .btn-primary:hover {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(32, 201, 151, 0.6);
+}
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.75);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    backdrop-filter: blur(5px);
+    animation: overlayFadeIn 0.3s ease;
+}
+
+@keyframes overlayFadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.modal-content {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    border-radius: 15px;
+    border: 3px solid #e94560;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    max-width: 500px;
+    width: 90%;
+    animation: modalFadeIn 0.3s ease;
+}
+
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9) translateY(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.modal-header {
+    padding: 20px 25px;
+    border-bottom: 2px solid #e94560;
+}
+
+.modal-header h3 {
+    color: #fff;
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: bold;
+    text-align: center;
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+.modal-body {
+    padding: 25px;
+    color: #fff;
+}
+
+.modal-body p {
+    margin-bottom: 10px;
+    font-size: 1.1rem;
+    line-height: 1.6;
+}
+
+.modal-body strong {
+    color: #e94560;
+    font-weight: bold;
+}
+
+.modal-body .text-muted {
+    color: rgba(255, 255, 255, 0.6) !important;
+    font-size: 0.95rem;
+}
+
+.modal-footer {
+    padding: 20px 25px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    gap: 15px;
+    justify-content: flex-end;
+}
+
+.modal-footer .btn {
+    padding: 10px 25px;
+    border-radius: 25px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.modal-footer .btn-secondary {
+    background-color: #6c757d;
+    border: 2px solid #6c757d;
+    color: #fff;
+}
+
+.modal-footer .btn-secondary:hover {
+    background-color: #5a6268;
+    border-color: #545b62;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(108, 117, 125, 0.4);
+}
+
+.modal-footer .btn-primary {
+    background: linear-gradient(135deg, #20c997 0%, #28a745 100%);
+    border: 2px solid #28a745;
+    color: #fff;
+}
+
+.modal-footer .btn-primary:hover {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(32, 201, 151, 0.6);
+}
+
+/* Responsive modal */
+@media (max-width: 576px) {
+    .modal-content {
+        width: 95%;
+        max-width: none;
+    }
+
+    .modal-header h3 {
+        font-size: 1.25rem;
+    }
+
+    .modal-body p {
+        font-size: 1rem;
+    }
+
+    .modal-footer {
+        flex-direction: column;
+    }
+
+    .modal-footer .btn {
+        width: 100%;
     }
 }

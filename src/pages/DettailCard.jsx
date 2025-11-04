@@ -1,28 +1,41 @@
 import { useParams, useNavigate } from "react-router-dom";
 import GlobalContext from "../context/GlobalContext";
-import { useContext } from "react";
-
+import { useContext, useState } from "react";
 
 function DettailCard() {
 
-    // CORREZIONE: Usa 'detail' (singolare) come definito in App.jsx
     const { detail } = useContext(GlobalContext);
     const { slug } = useParams();
     const navigate = useNavigate();
+
+    // Stato per la visualizzazione della carta bifronte
+    const [isFlippedLocal, setIsFlippedLocal] = useState(false);
+
+    // Determina se la carta è una carta bifronte (ha card_faces)
+    const isTransformCard = detail?.data?.card_faces && detail.data.card_faces.length === 2;
 
     // Funzione per gestire il tasto "Torna Indietro"
     const handleGoBack = () => {
         navigate(`/packs/${slug}`);
     };
-    
-    // Se lo stato detail non è presente (e.g. accesso diretto all'URL)
+
+    // Funzione per capovolgere la carta (solo se è bifronte)
+    const handleFlipCard = () => {
+        if (isTransformCard) {
+            setIsFlippedLocal(prev => !prev);
+        }
+    };
+
+    console.log("DettailCard detail state:", detail);
+
+    // Gestione stato non trovato
     if (!detail || Object.keys(detail).length === 0) {
         return (
             <div className="container min-vh-100 text-white p-4 p-sm-5 text-center">
                 <h1 className="text-danger">Dettagli Carta Non Trovati.</h1>
                 <p>Torna al pacchetto per visualizzare le informazioni.</p>
                 <button
-                    className="btn btn-action btn-go-back"
+                    className="btn btn-primary"
                     onClick={() => navigate(`/packs/${slug}`)}
                 >
                     <span className="me-2">←</span> Torna al pacchetto
@@ -31,20 +44,53 @@ function DettailCard() {
         );
     }
 
+    // Funzione per estrarre i dati della faccia corrente (fronte o retro)
+    const getCurrentFaceData = () => {
+        if (!isTransformCard) {
+            return detail.data || {};
+        }
+
+        const faceIndex = isFlippedLocal ? 1 : 0;
+        const currentFace = detail.data.card_faces[faceIndex];
+
+        // Estrai l'immagine corretta dall'array 'immagineUrl' di livello superiore
+        const faceImageUrl = Array.isArray(detail.immagineUrl) && detail.immagineUrl.length > 1
+            ? detail.immagineUrl[faceIndex]
+            : detail.immagineUrl;
+
+        return {
+            ...detail.data,
+            nome: currentFace.name,
+            type_line: currentFace.type_line,
+            oracle_text: currentFace.oracle_text,
+            flavor_text: currentFace.flavor_text,
+            artist: currentFace.artist,
+            imageUrl: faceImageUrl,
+            cardText: currentFace.oracle_text || currentFace.card_text
+        };
+    };
+
+    const currentFaceData = getCurrentFaceData();
+
     // Estrai i dati necessari
-    const cardName = decodeURIComponent(detail.nome || '');
-    const imageUrl = Array.isArray(detail.immagineUrl)
-        ? detail.immagineUrl[0]
-        : detail.immagineUrl;
+    const cardName = decodeURIComponent(currentFaceData.nome || detail.nome || '');
+
+    // Gestione di imageUrl (gestisce array con 1 o 2 elementi)
+    const sourceImageUrl = currentFaceData.imageUrl || detail.immagineUrl;
+
+    const imageUrl = Array.isArray(sourceImageUrl)
+        ? sourceImageUrl[isTransformCard && isFlippedLocal ? 1 : 0]
+        : sourceImageUrl;
+
     const rarityClass = `card-detail-rarity-${detail.rarity?.toLowerCase()}`;
 
-    // LOGICA PREZZO: assegna la classe CSS in base al valore
-    let priceClass = "bg-secondary text-white"; // Default fallback
+    // LOGICA PREZZO
+    let priceClass = "bg-secondary text-white";
     const priceText = detail.price && detail.price !== "N/A" ? `€ ${detail.price}` : "N/A";
-    
+
     if (detail.price && detail.price !== "N/A") {
         const priceValue = parseFloat(detail.price.replace('€', '').trim());
-        
+
         if (priceValue > 10) {
             priceClass = 'price-high';
         } else if (priceValue >= 1) {
@@ -57,23 +103,22 @@ function DettailCard() {
 
     // Funzione per gestire le interruzioni di riga nel testo oracolare
     const formatOracleText = (text) => {
-        // Sostituisce i simboli di mana di Magic the Gathering (e.g. {U}, {R}, {T}) con un testo più leggibile o li rimuove per semplicità
-        let formattedText = text.replace(/\{(\w+)\}/g, '[$1]'); 
-        
-        return formattedText.split('\\n').map((line, index) => (
+        let formattedText = text.replace(/\{(\w+)\}/g, '[$1]');
+
+        return formattedText.split('\n').map((line, index) => (
             <p key={index}>{line}</p>
         ));
     };
-    
-    // Se oracle_text non è presente, usa card_text per il display
-    const cardText = detail.data?.oracle_text || detail.data?.card_text;
-    
+
+    // Se oracle_text della faccia non è presente, usa card_text per il display
+    const cardText = currentFaceData.oracle_text || currentFaceData.card_text;
+
     return (
         <div className="container min-vh-100 text-white p-4 p-sm-5 card-detail-page">
-            
-            <div className="d-flex justify-content-center w-100 mb-4" style={{maxWidth: '900px'}}>
+
+            <div className="d-flex justify-content-center w-100 mb-4" style={{ maxWidth: '900px' }}>
                 <button
-                    className="btn btn-action btn-go-back"
+                    className="btn btn-primary"
                     onClick={handleGoBack}
                 >
                     <span className="me-2">←</span> Torna al Pacchetto
@@ -81,11 +126,35 @@ function DettailCard() {
             </div>
 
             <div className="card-detail-wrapper">
-                {/* Colonna Immagine */}
-                <div className="card-detail-image-container">
-                    <img 
-                        src={imageUrl} 
-                        alt={cardName} 
+
+                {/* Contenitore Immagine con Posizionamento Relativo per il Badge */}
+                <div className="card-detail-image-container position-relative">
+
+                    {isTransformCard && (
+                        <button
+                            // CLASSI AGGIORNATE: uso translate-middle-x e flip-badge-position
+                            className="badge bg-info text-dark p-2 rounded-pill d-flex align-items-center position-absolute start-50 translate-middle-x shadow flip-badge-position"
+                            onClick={handleFlipCard}
+                            // Rimosso lo stile top: '25px', ora gestito da CSS
+                            style={{ cursor: 'pointer', zIndex: 10 }}
+                        >
+                            {isFlippedLocal ? (
+                                <>
+                                    <span className="me-2 fw-bold">⟲</span>
+                                    Mostra FRONTE: **{detail.data?.card_faces[0]?.name}**
+                                </>
+                            ) : (
+                                <>
+                                    <span className="me-2 fw-bold">⟳</span>
+                                    Mostra RETRO: **{detail.data?.card_faces[1]?.name}**
+                                </>
+                            )}
+                        </button>
+                    )}
+
+                    <img
+                        src={imageUrl}
+                        alt={cardName}
                         className="card-detail-image"
                         onError={(e) => {
                             e.target.onerror = null;
@@ -93,17 +162,16 @@ function DettailCard() {
                         }}
                     />
                 </div>
-                
+
                 {/* Colonna Info */}
                 <div className="card-detail-info">
                     <h1 className="card-detail-name">{cardName}</h1>
-                    
+
                     {/* Metadati (Rarità, Prezzo, Set) */}
                     <div className="card-detail-meta">
                         <div className={`card-detail-meta-item ${rarityClass}`}>
                             Rarità: {detail.rarity?.toUpperCase()}
                         </div>
-                        {/* Applico la classe dinamica del prezzo qui */}
                         <div className={`card-detail-meta-item ${priceClass}`}>
                             Prezzo: {priceText}
                         </div>
@@ -113,7 +181,7 @@ function DettailCard() {
                     </div>
 
                     <h3 className="card-detail-type mt-4">
-                        {detail.data?.type_line || 'Tipo non disponibile'}
+                        {currentFaceData.type_line || 'Tipo non disponibile'}
                     </h3>
 
                     {/* Testo Oracolo/Effetti */}
@@ -125,23 +193,23 @@ function DettailCard() {
                             </div>
                         </div>
                     )}
-                    
+
                     {/* Testo di colore/Flavor Text */}
-                    {detail.data?.flavor_text && (
+                    {currentFaceData.flavor_text && (
                         <div className="card-detail-section">
                             <h4>Testo di Colore</h4>
                             <p className="card-detail-text fst-italic">
-                                {detail.data.flavor_text}
+                                {currentFaceData.flavor_text}
                             </p>
                         </div>
                     )}
-                    
+
                     {/* Artista */}
-                    {detail.data?.artist && (
+                    {currentFaceData.artist && (
                         <div className="card-detail-section">
                             <h4>Artista</h4>
                             <p className="card-detail-text">
-                                {detail.data.artist}
+                                {currentFaceData.artist}
                             </p>
                         </div>
                     )}
