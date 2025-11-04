@@ -40,11 +40,14 @@ const CardFlip = ({ carta, index, onFlip, isFlippedState }) => {
       <div className="card-scale-wrapper">
         <div className={`card-inner ${isFlippedState ? "flipped" : ""}`}>
           <div className="card-face card-back">
-            <img
-              src={backImageUrl}
-              alt="Card Back"
-              className="card-back-image"
-            />
+            {/* FIX: Aggiunto un wrapper d-flex con h-100 per mantenere l'altezza uniforme e centrare l'immagine sul retro. */}
+            <div className="d-flex flex-column h-100 justify-content-center align-items-center">
+              <img
+                src={backImageUrl}
+                alt="Card Back"
+                className="card-back-image"
+              />
+            </div>
           </div>
           <div className="card-face card-front">
             {/* RIMOSSO p-2: il padding è ora gestito dal CSS globale per garantire l'uniformità dell'altezza */}
