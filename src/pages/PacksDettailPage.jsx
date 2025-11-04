@@ -183,6 +183,7 @@ function PacksDettail() {
 
   // SINCRONIZZAZIONE: salva i nuovi dati nel contesto globale
   useEffect(() => {
+    // 1. Controlliamo che ci siano dati validi dal hook
     if (hookData && hookData.contents && hookData.contents.length > 0) {
       // Aggiungi isFlipped: false a tutte le carte
       const contentsWithState = hookData.contents.map((card) => ({
