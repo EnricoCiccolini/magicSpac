@@ -132,21 +132,19 @@ function DettailCard() {
 
                     {isTransformCard && (
                         <button
-                            // CLASSI AGGIORNATE: uso translate-middle-x e flip-badge-position
-                            className="badge bg-info text-dark p-2 rounded-pill d-flex align-items-center position-absolute start-50 translate-middle-x shadow flip-badge-position"
+                            className="flip-card-badge position-absolute flip-badge-position"
                             onClick={handleFlipCard}
-                            // Rimosso lo stile top: '25px', ora gestito da CSS
-                            style={{ cursor: 'pointer', zIndex: 10 }}
+                            style={{ zIndex: 10 }}
                         >
                             {isFlippedLocal ? (
                                 <>
-                                    <span className="me-2 fw-bold">⟲</span>
-                                    Mostra FRONTE: **{detail.data?.card_faces[0]?.name}**
+                                    <span className="flip-icon">⟲</span>
+                                    <span>FRONTE</span>
                                 </>
                             ) : (
                                 <>
-                                    <span className="me-2 fw-bold">⟳</span>
-                                    Mostra RETRO: **{detail.data?.card_faces[1]?.name}**
+                                    <span className="flip-icon">⟳</span>
+                                    <span>RETRO</span>
                                 </>
                             )}
                         </button>
