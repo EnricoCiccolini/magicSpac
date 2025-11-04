@@ -7,11 +7,11 @@ export function usePacks() {
   const [packs, setPacks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
-  
+
   const [searchTerm, setSearchTerm] = useState(() => {
     return sessionStorage.getItem("mtg_searchTerm") || "";
   });
-  
+
   const [sortBy, setSortBy] = useState(() => {
     return sessionStorage.getItem("mtg_sortBy") || "released_at_desc";
   });
@@ -23,7 +23,7 @@ export function usePacks() {
   function fetchPacks() {
     setLoading(true);
     axios
-      .get("http://localhost:3000/set")
+      .get("https://magic-spac-jtur.vercel.app/set")
       .then((response) => {
         const allSets = response.data.sets || response.data || [];
         setPacks(allSets);

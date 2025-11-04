@@ -25,7 +25,7 @@ const useOpen = (slug, options = {}) => {
         setError(null);
         setData(null); // Resetta i dati per l'apertura di un nuovo pacchetto
 
-        axios.get(`http://localhost:3000/set/open/${slug}`)
+        axios.get(`https://magic-spac-jtur.vercel.app/set/open/${slug}`)
             .then((response) => {
                 setData(response.data);
                 setLoading(false);
